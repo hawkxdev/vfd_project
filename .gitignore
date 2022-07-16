@@ -138,4 +138,6 @@ dmypy.json
 /data/orders/_delta/
 /data/orders/_eaton_aut/
 /data/orders/order_files/
-/media/
+
+/media/images/
+/media/logos/
