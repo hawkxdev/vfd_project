@@ -140,3 +140,4 @@ dmypy.json
 /data/orders/order_files/
 
 media/
+upload/

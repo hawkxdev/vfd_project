@@ -1,0 +1,11 @@
+{% extends 'base-section-full.html' %}
+
+{% block section_content_100 %}
+    <form action="{% url 'import_files_view' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
+
+{% block num_li %} 1 {% endblock num_li %}
