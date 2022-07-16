@@ -139,5 +139,4 @@ dmypy.json
 /data/orders/_eaton_aut/
 /data/orders/order_files/
 
-/media/images/
-/media/logos/
+media/
