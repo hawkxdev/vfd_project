@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-
+from api.import_api import import_file
 from vfd import forms
 
 
@@ -20,7 +20,7 @@ def import_files_view(request):
         form = forms.SimpleUploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             filename = handle_uploaded_file('upload', request.FILES['file'])
-            # res = orders_api.add_orient_dates(filename)
+            import_file(filename)
             return redirect('/import')
     else:
         form = forms.SimpleUploadFileForm()

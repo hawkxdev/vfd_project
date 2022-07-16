@@ -167,18 +167,18 @@ class FrequencyDrive(models.Model):
     power = models.FloatField('Мощность', choices=POWER_CHOICES)
     current = models.FloatField('Ток')
     VOLT_CHOICES = (
-        (380, 380),
-        (220, 220),
+        (400, 400),
+        (230, 230),
     )
     voltage = models.FloatField('Напряжение', default=380, choices=VOLT_CHOICES)
 
     def __str__(self):
-        return str(f'{self.series.brand} | {self.article} | {self.power}kW')
+        return str(f'{self.series.brand} | {self.series.name} | {self.article} | {self.power}kW')
 
     class Meta:
         verbose_name = 'Частотник'
         verbose_name_plural = 'Частотники'
-        ordering = ('series__brand', 'article')
+        ordering = ('series__brand', 'series__name', 'voltage', 'power')
 
 
 class AccessoryType(models.Model):
@@ -199,7 +199,7 @@ class Accessory(models.Model):
     series = models.ManyToManyField(Series, verbose_name='Серии')
 
     def __str__(self):
-        return str(f'{self.series.brand} | {self.article} | {self.name}')
+        return str(f'{self.series.first().brand} | {self.article} | {self.name}')
 
     class Meta:
         verbose_name = 'Аксессуар'
