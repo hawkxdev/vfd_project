@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+
+from api.create_files_api import create_compare_price
 from api.import_api import import_file
 from vfd import forms
 
@@ -26,3 +28,19 @@ def import_files_view(request):
         form = forms.SimpleUploadFileForm()
 
     return render(request, 'vfd/import.html', {'form': form})
+
+
+# CREATE FILES #
+
+def create_compare_price_view(request):
+    if request.method == 'POST':
+        form = forms.CreateComparePriceForm(request.POST)
+        if form.is_valid():
+            supplier = request.POST.get('supplier', )
+            # print(supplier)
+            create_compare_price()
+            return redirect('/create/compare-price/')
+    else:
+        form = forms.CreateComparePriceForm()
+
+    return render(request, 'vfd/create/compare.html', {'form': form})

@@ -41,6 +41,7 @@ class Supplier(models.Model):
     class Meta:
         verbose_name = 'Поставщик'
         verbose_name_plural = 'Поставщики'
+        ordering = ('name',)
 
 
 class Brand(models.Model):
@@ -208,7 +209,9 @@ class Accessory(models.Model):
 
 
 class Price(models.Model):
-    frequency_drive = models.ForeignKey(FrequencyDrive, verbose_name='Частотник', on_delete=models.PROTECT)
+    frequency_drive = models.ForeignKey(FrequencyDrive, verbose_name='Частотник', on_delete=models.PROTECT,
+                                        blank=True, null=True)
+    accessory = models.ForeignKey(Accessory, verbose_name='Аксессуар', on_delete=models.PROTECT, blank=True, null=True)
     supplier = models.ForeignKey(Supplier, verbose_name='Поставщик', on_delete=models.PROTECT)
     price = models.FloatField('Цена')
 

@@ -1,0 +1,30 @@
+{% extends 'vfd/create/base.html' %}
+
+{% block content_create %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-primary">
+    </form>
+
+    <script>
+        $(document).ready(function () {
+
+        })
+
+        let getUrlParameter = function getUrlParameter(sParam) {
+            let sPageURL = window.location.search.substring(1), sURLVariables = sPageURL.split('&'), sParameterName, i
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=')
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1])
+                }
+            }
+            return false
+        }
+    </script>
+
+{% endblock content_create %}
+
+{% block num_li_sales_nav %} 1 {% endblock num_li_sales_nav %}

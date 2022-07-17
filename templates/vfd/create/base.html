@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Files{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-column">
+        {% include 'vfd/create/navbar.html' %}
+        <div class="section-content p-3">
+            {% block content_create %}
+            {% endblock content_create %}
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            let i = 1
+            $('.navbar').find('li').each(function () {
+                if (i !== {% block num_li_sales_nav %} {% endblock num_li_sales_nav %}) {
+                    $(this).find('a').removeClass('active')
+                } else {
+                    $(this).find('a').addClass('active')
+                }
+                i += 1
+            })
+        });
+    </script>
+{% endblock content %}
+
+{% block num_li %} 3 {% endblock num_li %}
