@@ -90,20 +90,20 @@ class Series(models.Model):
     applications = models.ManyToManyField(Application, verbose_name='Применения')
     power_min = models.FloatField(verbose_name='Мощность, от')
     power_max = models.FloatField(verbose_name='Мощность, до')
-    overload_capacity = models.CharField('Перегрузочная способность', max_length=200)
-    digital_inputs = models.IntegerField(verbose_name='Дискретные входы')
-    analog_inputs = models.IntegerField(verbose_name='Аналоговые входы')
-    transistor_outputs = models.IntegerField(verbose_name='Транзисторные выходы')
-    relay_outputs = models.IntegerField(verbose_name='Релейные выходы')
-    analog_outputs = models.IntegerField(verbose_name='Аналоговые выходы')
-    control_panel = models.CharField('Панель управления', max_length=200)
-    control_panel_included = models.BooleanField('Панель управления в комплекте')
+    overload_capacity = models.CharField('Перегрузочная способность', max_length=200, blank=True, null=True)
+    digital_inputs = models.IntegerField(verbose_name='Дискретные входы', blank=True, null=True)
+    analog_inputs = models.IntegerField(verbose_name='Аналоговые входы', blank=True, null=True)
+    transistor_outputs = models.IntegerField(verbose_name='Транзисторные выходы', blank=True, null=True)
+    relay_outputs = models.IntegerField(verbose_name='Релейные выходы', blank=True, null=True)
+    analog_outputs = models.IntegerField(verbose_name='Аналоговые выходы', blank=True, null=True)
+    control_panel = models.CharField('Панель управления', max_length=200, blank=True, null=True)
+    control_panel_included = models.BooleanField('Панель управления в комплекте', blank=True, null=True)
     COMMUNICATION_CHOICES = (
         ('No', 'Нет'),
         ('ModBusRTU', 'RS-485 Modbus RTU'),
     )
     built_in_communication = models.CharField('Встроенный протокол связи', max_length=200,
-                                              choices=COMMUNICATION_CHOICES)
+                                              choices=COMMUNICATION_CHOICES, blank=True, null=True)
     ADD_COMMUNICATION_CHOICES = (
         ('No', 'Нет'),
         ('Expansion cards', 'Да, платы расширения'),
@@ -111,38 +111,44 @@ class Series(models.Model):
         ('CANopen', 'CANopen'),
     )
     additional_communications = models.CharField('Дополнительные протоколы связи', max_length=200,
-                                                 choices=ADD_COMMUNICATION_CHOICES)
+                                                 choices=ADD_COMMUNICATION_CHOICES, blank=True, null=True)
     EMC_FILTER_CHOICES = (
         ('No', 'Нет'),
         ('C3', 'C3'),
         ('C2', 'C2'),
         ('No_C2', 'Нет/C2'),
     )
-    emc_filter = models.CharField(verbose_name='Встроенный EMC фильтр', max_length=10, choices=EMC_FILTER_CHOICES)
-    choke_dc_link = models.CharField(verbose_name='Дроссель в звене постоянного тока', max_length=300)
-    brake_interrupter = models.CharField(verbose_name='Тормозной прерыватель', max_length=300)
+    emc_filter = models.CharField(verbose_name='Встроенный EMC фильтр', max_length=10, choices=EMC_FILTER_CHOICES
+                                  , blank=True, null=True)
+    choke_dc_link = models.CharField(verbose_name='Дроссель в звене постоянного тока', max_length=300
+                                     , blank=True, null=True)
+    brake_interrupter = models.CharField(verbose_name='Тормозной прерыватель', max_length=300
+                                         , blank=True, null=True)
     PLC_CHOICES = (
         ('No', 'Нет'),
         ('Yes', 'Да'),
         ('mini-PLC', 'mini-PLC'),
         ('SequenceProgramming', 'Программирование последовательности'),
     )
-    built_in_plc = models.CharField(verbose_name='Встроенный ПЛК', max_length=200, choices=PLC_CHOICES)
+    built_in_plc = models.CharField(verbose_name='Встроенный ПЛК', max_length=200, choices=PLC_CHOICES
+                                    , blank=True, null=True)
     PROTECTION_CHOICES = (
         ('IP20', 'IP20'),
         ('IP21', 'IP21'),
         ('IP55', 'IP55'),
     )
-    protection_degree = models.CharField(verbose_name='Степень защиты', max_length=200, choices=PROTECTION_CHOICES)
+    protection_degree = models.CharField(verbose_name='Степень защиты', max_length=200, choices=PROTECTION_CHOICES
+                                         , blank=True, null=True)
     TEMP_CHOICES = (
         ('-10...+40', '-10...+40'),
         ('-10...+50', '-10...+50'),
         ('-15...+50', '-15...+50'),
         ('-20...+50', '-20...+50'),
     )
-    operating_temp = models.CharField(verbose_name='Рабочая температура', max_length=200, choices=TEMP_CHOICES)
-    description = models.TextField('Описание')
-    image = models.ImageField('Картинка', upload_to='images/')
+    operating_temp = models.CharField(verbose_name='Рабочая температура', max_length=200, choices=TEMP_CHOICES
+                                      , blank=True, null=True)
+    description = models.TextField('Описание', blank=True, null=True)
+    image = models.ImageField('Картинка', upload_to='images/', blank=True, null=True)
 
     def __str__(self):
         return str(f'{self.brand} {self.name}')

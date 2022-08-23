@@ -20,18 +20,33 @@ def column_by_n(n):
 
 def create_compare_price():
     comparison_zone = ComparisonZone()
-    comparison_zone.suppliers = [3, 4, 5]
+
+    # comparison_zone.suppliers = [3, 4, 5]
+    # comparison_zone.blocks = [
+    #     Block((9, 11, 13)),
+    #     Block((9, None, 14)),
+    #     Block((7, 11, 13)),
+    #     Block((7, None, 14)),
+    #     Block((7, 12, 15)),
+    #     Block((6, 12, 15)),
+    #     Block((8, 12, 15)),
+    # ]
+
+    comparison_zone.suppliers = [6, 3, 4, 5]
     comparison_zone.blocks = [
-        Block((9, 11, 13)),
-        Block((9, None, 14)),
-        Block((7, 11, 13)),
-        Block((7, None, 14)),
-        Block((7, 12, 15)),
-        Block((6, 12, 15)),
-        Block((8, 12, 15)),
+        Block((19, 9, 11, 13)),
+        Block((20, 9, 11, 14)),
+        Block((19, 7, 11, 13)),
+        Block((20, 7, 11, 14)),
+        Block((20, 7, 12, 15)),
+        Block((21, 6, 12, 15)),
+        Block((21, 8, 12, 15)),
+        Block((22, 6, 12, 15)),
+        Block((22, 8, 12, 15)),
     ]
 
-    eur_rub = 65.09
+    eur_rub = 57.45
+    eur_usd = 1.01
 
     xlsx = Xlsx('upload/compare.xlsx', overwrite=True)
     row = 1
@@ -70,7 +85,7 @@ def create_compare_price():
                 currency = supplier.currency
                 xlsx.ws.cell(row=row, column=column_by_n(j) + 2).value = currency
 
-                if currency == 'RUB':
+                if currency != 'EUR':
                     block.price_col.append(column_by_n(j) + 3)
                 else:
                     block.price_col.append(column_by_n(j) + 2)
@@ -90,6 +105,8 @@ def create_compare_price():
                             price_val = price
                             if currency == 'RUB':
                                 price_val = round(price_val / eur_rub, 2)
+                            elif currency == 'USD':
+                                price_val = round(price_val / eur_usd, 2)
                             xlsx.ws.cell(row=row_s, column=column_by_n(j) + 2).value = price
                             col = xl_col_to_name(column_by_n(j) + 1)
                             xlsx.ws[f'{col}{row_s}'].number_format = '0.00'
@@ -98,11 +115,16 @@ def create_compare_price():
                             if price != price_val:
                                 col1 = xl_col_to_name(column_by_n(j) + 1)
                                 col2 = xl_col_to_name(column_by_n(j) + 2)
-                                xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3).value = f'={col1}{row_s}/{eur_rub}'
+                                if currency == 'RUB':
+                                    xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
+                                        .value = f'={col1}{row_s}/{eur_rub}'
+                                elif currency == 'USD':
+                                    xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
+                                        .value = f'={col1}{row_s}/{eur_usd}'
                                 xlsx.ws[f'{col2}{row_s}'].number_format = '0.00'
                                 col_r = column_by_n(j) + 3
 
-                        if j != 0:
+                        if j != 0 and col_r:
                             col1 = xl_col_to_name(col_r - 1)
                             col2 = xl_col_to_name(block.price_col[0] - 1)
                             col = xl_col_to_name(col_r)
