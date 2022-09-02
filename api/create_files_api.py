@@ -32,21 +32,19 @@ def create_compare_price():
     #     Block((8, 12, 15)),
     # ]
 
-    comparison_zone.suppliers = [6, 3, 4, 5]
+    comparison_zone.suppliers = [8, 6]
     comparison_zone.blocks = [
-        Block((19, 9, 11, 13)),
-        Block((20, 9, 11, 14)),
-        Block((19, 7, 11, 13)),
-        Block((20, 7, 11, 14)),
-        Block((20, 7, 12, 15)),
-        Block((21, 6, 12, 15)),
-        Block((21, 8, 12, 15)),
-        Block((22, 6, 12, 15)),
-        Block((22, 8, 12, 15)),
+        Block((24, 19)),
+        Block((24, 20)),
+        Block((26, 20)),
+        Block((26, 21)),
+        Block((25, 21)),
+        Block((25, 22)),
     ]
 
-    eur_rub = 57.45
-    eur_usd = 1.01
+    eur_rub = 59.81
+    eur_usd = 1.00
+    usd_rub = 59.84
 
     xlsx = Xlsx('upload/compare.xlsx', overwrite=True)
     row = 1
@@ -85,7 +83,12 @@ def create_compare_price():
                 currency = supplier.currency
                 xlsx.ws.cell(row=row, column=column_by_n(j) + 2).value = currency
 
-                if currency != 'EUR':
+                # if currency != 'EUR':
+                #     block.price_col.append(column_by_n(j) + 3)
+                # else:
+                #     block.price_col.append(column_by_n(j) + 2)
+
+                if currency != 'USD':
                     block.price_col.append(column_by_n(j) + 3)
                 else:
                     block.price_col.append(column_by_n(j) + 2)
@@ -103,10 +106,17 @@ def create_compare_price():
                         if price:
                             price = price.price
                             price_val = price
+
+                            # if currency == 'RUB':
+                            #     price_val = round(price_val / eur_rub, 2)
+                            # elif currency == 'USD':
+                            #     price_val = round(price_val / eur_usd, 2)
+
                             if currency == 'RUB':
-                                price_val = round(price_val / eur_rub, 2)
-                            elif currency == 'USD':
-                                price_val = round(price_val / eur_usd, 2)
+                                price_val = round(price_val / usd_rub, 2)
+                            elif currency == 'EUR':
+                                price_val = round(price_val * eur_usd, 2)
+
                             xlsx.ws.cell(row=row_s, column=column_by_n(j) + 2).value = price
                             col = xl_col_to_name(column_by_n(j) + 1)
                             xlsx.ws[f'{col}{row_s}'].number_format = '0.00'
@@ -115,12 +125,21 @@ def create_compare_price():
                             if price != price_val:
                                 col1 = xl_col_to_name(column_by_n(j) + 1)
                                 col2 = xl_col_to_name(column_by_n(j) + 2)
+
+                                # if currency == 'RUB':
+                                #     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
+                                #         .value = f'={col1}{row_s}/{eur_rub}'
+                                # elif currency == 'USD':
+                                #     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
+                                #         .value = f'={col1}{row_s}/{eur_usd}'
+
                                 if currency == 'RUB':
                                     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
-                                        .value = f'={col1}{row_s}/{eur_rub}'
-                                elif currency == 'USD':
+                                        .value = f'={col1}{row_s}/{usd_rub}'
+                                elif currency == 'EUR':
                                     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
-                                        .value = f'={col1}{row_s}/{eur_usd}'
+                                        .value = f'={col1}{row_s}*{eur_usd}'
+
                                 xlsx.ws[f'{col2}{row_s}'].number_format = '0.00'
                                 col_r = column_by_n(j) + 3
 
