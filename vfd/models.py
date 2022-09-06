@@ -91,6 +91,20 @@ class Series(models.Model):
     power_min = models.FloatField(verbose_name='Мощность, от')
     power_max = models.FloatField(verbose_name='Мощность, до')
     overload_capacity = models.TextField('Перегрузочная способность', blank=True, null=True)
+
+    control_methods = models.CharField(verbose_name='Методы управления', max_length=200, blank=True, null=True)
+    starting_torque = models.CharField('Пусковой момент', max_length=200, blank=True, null=True)
+    setting_vf_characteristic = models.CharField('Задание характеристики V/F', max_length=200, blank=True, null=True)
+    speed_control_range = models.FloatField(verbose_name='Диапазон регулирования скорости, Гц', blank=True, null=True)
+    torque_limitation = models.CharField('Ограничение момента', max_length=200, blank=True, null=True)
+    torque_accuracy = models.CharField('Точность по моменту', max_length=20, blank=True, null=True)
+    maximum_output_frequency = models.CharField(verbose_name='Максимальная выходная частота',
+                                                max_length=200, blank=True, null=True)
+    output_frequency_accuracy = models.CharField('Точность выходной частоты', max_length=200, blank=True, null=True)
+    frequency_set_discreteness = models.CharField('Дискретность задания частоты', max_length=200, blank=True, null=True)
+    frequency_set_signals = models.CharField('Сигналы задания частоты', max_length=200, blank=True, null=True)
+    acceleration_deceleration_time = models.CharField('Время разгона/торможения', max_length=200, blank=True, null=True)
+
     digital_inputs = models.IntegerField(verbose_name='Дискретные входы', blank=True, null=True)
     analog_inputs = models.IntegerField(verbose_name='Аналоговые входы', blank=True, null=True)
     transistor_outputs = models.IntegerField(verbose_name='Транзисторные выходы', blank=True, null=True)
