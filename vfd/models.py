@@ -90,7 +90,7 @@ class Series(models.Model):
     applications = models.ManyToManyField(Application, verbose_name='Применения')
     power_min = models.FloatField(verbose_name='Мощность, от')
     power_max = models.FloatField(verbose_name='Мощность, до')
-    overload_capacity = models.CharField('Перегрузочная способность', max_length=200, blank=True, null=True)
+    overload_capacity = models.TextField('Перегрузочная способность', blank=True, null=True)
     digital_inputs = models.IntegerField(verbose_name='Дискретные входы', blank=True, null=True)
     analog_inputs = models.IntegerField(verbose_name='Аналоговые входы', blank=True, null=True)
     transistor_outputs = models.IntegerField(verbose_name='Транзисторные выходы', blank=True, null=True)
