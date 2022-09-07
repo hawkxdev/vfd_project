@@ -104,6 +104,18 @@ class Series(models.Model):
     frequency_set_discreteness = models.CharField('Дискретность задания частоты', max_length=200, blank=True, null=True)
     frequency_set_signals = models.CharField('Сигналы задания частоты', max_length=200, blank=True, null=True)
     acceleration_deceleration_time = models.CharField('Время разгона/торможения', max_length=200, blank=True, null=True)
+    main_control_functions = models.TextField('Основные функции управления', blank=True, null=True)
+    control_built_in_fan = models.CharField('Управление встроенным вентилятором охлаждения',
+                                            max_length=200, blank=True, null=True)
+    engine_protection = models.CharField('Защита двигателя', max_length=200, blank=True, null=True)
+    overcurrent_protection = models.TextField('Защита от перегрузки по току', blank=True, null=True)
+    overvoltage_protection = models.CharField('Защита по превышению напряжения', max_length=200, blank=True, null=True)
+    temperature_protection = models.CharField('Защита по температуре', max_length=200, blank=True, null=True)
+    stop_prevention = models.CharField('Предотвращение остановки', max_length=200, blank=True, null=True)
+    automatic_start_after_power_loss = models.CharField('Автоматический запуск после пропадания питания',
+                                                        max_length=200, blank=True, null=True)
+    current_leakage_protection = models.CharField('Защита от утечек тока на землю',
+                                                  max_length=200, blank=True, null=True)
 
     digital_inputs = models.IntegerField(verbose_name='Дискретные входы', blank=True, null=True)
     analog_inputs = models.IntegerField(verbose_name='Аналоговые входы', blank=True, null=True)
@@ -144,8 +156,32 @@ class Series(models.Model):
         ('mini-PLC', 'mini-PLC'),
         ('SequenceProgramming', 'Программирование последовательности'),
     )
-    built_in_plc = models.CharField(verbose_name='Встроенный ПЛК', max_length=200, choices=PLC_CHOICES
-                                    , blank=True, null=True)
+    built_in_plc = models.CharField(verbose_name='Встроенный ПЛК',
+                                    max_length=200, choices=PLC_CHOICES, blank=True, null=True)
+
+    installation_place = models.CharField(verbose_name='Место установки', max_length=200, blank=True, null=True)
+    operating_temp = models.CharField(verbose_name='Рабочая температура, ℃', max_length=200, blank=True, null=True)
+    storage_temp = models.CharField(verbose_name='Температура хранения, ℃', max_length=200, blank=True, null=True)
+    transport_temp = models.CharField(verbose_name='Температура транспортировки, ℃', max_length=200, blank=True, null=True)
+    use_relative_humidity = models.CharField(verbose_name='Относительная влажность при эксплуатации',
+                                             max_length=200, blank=True, null=True)
+    storage_transportation_relative_humidity = models.CharField(
+        verbose_name='Относительная влажность при хранении/транспортировке', max_length=200, blank=True, null=True)
+    atmospheric_pressure_use_storage = models.CharField(verbose_name='Атмосферное давление при эксплуатации/хранении, кПа',
+                                                        max_length=200, blank=True, null=True)
+    atmospheric_pressure_transportation = models.CharField(verbose_name='Атмосферное давление при транспортировке, кПа',
+                                                           max_length=200, blank=True, null=True)
+    pollution_level_use = models.CharField(verbose_name='Уровень загрязнения при эксплуатации',
+                                           max_length=200, blank=True, null=True)
+    pollution_level_storage = models.CharField(verbose_name='Уровень загрязнения при хранении',
+                                               max_length=200, blank=True, null=True)
+    pollution_level_transportation = models.CharField(verbose_name='Уровень загрязнения при транспортировке',
+                                                      max_length=200, blank=True, null=True)
+    installation_altitude = models.TextField(verbose_name='Высота установки', blank=True, null=True)
+    vibration = models.TextField(verbose_name='Вибрация', blank=True, null=True)
+    impact_resistance = models.TextField(verbose_name='Ударопрочность', blank=True, null=True)
+    mounting_position = models.CharField(verbose_name='Положение монтажа', max_length=200, blank=True, null=True)
+
     PROTECTION_CHOICES = (
         ('IP20', 'IP20'),
         ('IP21', 'IP21'),
@@ -153,14 +189,7 @@ class Series(models.Model):
     )
     protection_degree = models.CharField(verbose_name='Степень защиты', max_length=200, choices=PROTECTION_CHOICES
                                          , blank=True, null=True)
-    TEMP_CHOICES = (
-        ('-10...+40', '-10...+40'),
-        ('-10...+50', '-10...+50'),
-        ('-15...+50', '-15...+50'),
-        ('-20...+50', '-20...+50'),
-    )
-    operating_temp = models.CharField(verbose_name='Рабочая температура', max_length=200, choices=TEMP_CHOICES
-                                      , blank=True, null=True)
+
     description = models.TextField('Описание', blank=True, null=True)
     image = models.ImageField('Картинка', upload_to='images/', blank=True, null=True)
 

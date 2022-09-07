@@ -37,22 +37,30 @@ class SeriesAdmin(admin.ModelAdmin):
             'fields': (('control_methods', 'starting_torque', 'setting_vf_characteristic', 'speed_control_range',
                         'torque_limitation', 'torque_accuracy', 'maximum_output_frequency',
                         'output_frequency_accuracy', 'frequency_set_discreteness', 'overload_capacity',
-                        'frequency_set_signals', 'acceleration_deceleration_time'),)
+                        'frequency_set_signals', 'acceleration_deceleration_time', 'main_control_functions',
+                        'control_built_in_fan', 'engine_protection', 'overcurrent_protection',
+                        'overvoltage_protection', 'temperature_protection', 'stop_prevention',
+                        'automatic_start_after_power_loss', 'current_leakage_protection'),)
         }),
-        (None, {
+        ('Плата управления', {
             'fields': (('digital_inputs', 'analog_inputs', 'transistor_outputs', 'relay_outputs', 'analog_outputs'),)
         }),
-        (None, {
+        ('Опции', {
             'fields': (('control_panel', 'control_panel_included',
                         'built_in_communication', 'additional_communications'),)
         }),
         (None, {
             'fields': (('emc_filter', 'choke_dc_link', 'brake_interrupter', 'built_in_plc'),)
         }),
-        (None, {
-            'fields': (('protection_degree', 'operating_temp'),)
+        ('Условия эксплуатации, хранения и транспортировки', {
+            'fields': (('installation_place', 'operating_temp', 'storage_temp', 'transport_temp',
+                        'use_relative_humidity', 'storage_transportation_relative_humidity',
+                        'atmospheric_pressure_use_storage', 'atmospheric_pressure_transportation',
+                        'pollution_level_use', 'pollution_level_storage', 'pollution_level_transportation',
+                        'installation_altitude', 'vibration', 'impact_resistance', 'mounting_position',
+                        'protection_degree'),)
         }),
-        (None, {
+        ('Описание', {
             'fields': (('description',),)
         }),
     )
@@ -72,4 +80,24 @@ class SeriesAdmin(admin.ModelAdmin):
         form.base_fields['frequency_set_discreteness'].widget.attrs['style'] = 'width: 45em;'
         form.base_fields['overload_capacity'].widget.attrs['style'] = 'width: 45em; height: 4em;'
         form.base_fields['frequency_set_signals'].widget.attrs['style'] = 'width: 25em;'
+        form.base_fields['control_built_in_fan'].widget.attrs['style'] = 'width: 45em;'
+        form.base_fields['overcurrent_protection'].widget.attrs['style'] = 'width: 40em; height: 4em;'
+        form.base_fields['overvoltage_protection'].widget.attrs['style'] = 'width: 35em;'
+        form.base_fields['stop_prevention'].widget.attrs['style'] = 'width: 35em;'
+        form.base_fields['current_leakage_protection'].widget.attrs['style'] = 'width: 30em;'
+        form.base_fields['installation_place'].widget.attrs['style'] = 'width: 35em;'
+        form.base_fields['use_relative_humidity'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['storage_transportation_relative_humidity'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['atmospheric_pressure_use_storage'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['atmospheric_pressure_transportation'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['installation_altitude'].widget.attrs['style'] = 'width: 40em; height: 5em;'
+        form.base_fields['vibration'].widget.attrs['style'] = 'width: 40em; height: 5em;'
+        form.base_fields['impact_resistance'].widget.attrs['style'] = 'width: 40em; height: 6em;'
+        form.base_fields['mounting_position'].widget.attrs['style'] = 'width: 40em;'
+        form.base_fields['operating_temp'].widget.attrs['style'] = 'width: 70em;'
+        form.base_fields['storage_temp'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['transport_temp'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['pollution_level_use'].widget.attrs['style'] = 'width: 10em;'
+        form.base_fields['pollution_level_storage'].widget.attrs['style'] = 'width: 10em;'
+        form.base_fields['pollution_level_transportation'].widget.attrs['style'] = 'width: 10em;'
         return form
