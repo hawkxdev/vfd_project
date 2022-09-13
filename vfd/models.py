@@ -122,22 +122,19 @@ class Series(models.Model):
     transistor_outputs = models.IntegerField(verbose_name='Транзисторные выходы', blank=True, null=True)
     relay_outputs = models.IntegerField(verbose_name='Релейные выходы', blank=True, null=True)
     analog_outputs = models.IntegerField(verbose_name='Аналоговые выходы', blank=True, null=True)
-    control_panel = models.CharField('Панель управления', max_length=200, blank=True, null=True)
+    control_panel = models.TextField('Панель управления', blank=True, null=True)
     control_panel_included = models.BooleanField('Панель управления в комплекте', blank=True, null=True)
+    control_panel_at_distance = models.CharField('Возможность выносного крепления панели',
+                                                 max_length=200, blank=True, null=True)
     COMMUNICATION_CHOICES = (
         ('No', 'Нет'),
-        ('ModBusRTU', 'RS-485 Modbus RTU'),
+        ('ModBusRTU', 'Modbus RTU'),
+        ('ModBusRTU/BACnet', 'Modbus RTU, BACnet'),
     )
     built_in_communication = models.CharField('Встроенный протокол связи', max_length=200,
                                               choices=COMMUNICATION_CHOICES, blank=True, null=True)
-    ADD_COMMUNICATION_CHOICES = (
-        ('No', 'Нет'),
-        ('Expansion cards', 'Да, платы расширения'),
-        ('ModBusRTU', 'RS-485 Modbus RTU'),
-        ('CANopen', 'CANopen'),
-    )
-    additional_communications = models.CharField('Дополнительные протоколы связи', max_length=200,
-                                                 choices=ADD_COMMUNICATION_CHOICES, blank=True, null=True)
+    additional_communications = models.CharField('Дополнительные протоколы связи',
+                                                 max_length=200, blank=True, null=True)
     EMC_FILTER_CHOICES = (
         ('No', 'Нет'),
         ('C3', 'C3'),
@@ -150,27 +147,21 @@ class Series(models.Model):
                                      , blank=True, null=True)
     brake_interrupter = models.CharField(verbose_name='Тормозной прерыватель', max_length=300
                                          , blank=True, null=True)
-    PLC_CHOICES = (
-        ('No', 'Нет'),
-        ('Yes', 'Да'),
-        ('mini-PLC', 'mini-PLC'),
-        ('SequenceProgramming', 'Программирование последовательности'),
-    )
-    built_in_plc = models.CharField(verbose_name='Встроенный ПЛК',
-                                    max_length=200, choices=PLC_CHOICES, blank=True, null=True)
+    built_in_plc = models.CharField(verbose_name='Встроенный ПЛК', max_length=200, blank=True, null=True)
 
     installation_place = models.CharField(verbose_name='Место установки', max_length=200, blank=True, null=True)
-    operating_temp = models.CharField(verbose_name='Рабочая температура, ℃', max_length=200, blank=True, null=True)
+    operating_temp = models.TextField(verbose_name='Рабочая температура, ℃', blank=True, null=True)
     storage_temp = models.CharField(verbose_name='Температура хранения, ℃', max_length=200, blank=True, null=True)
-    transport_temp = models.CharField(verbose_name='Температура транспортировки, ℃', max_length=200, blank=True, null=True)
+    transport_temp = models.CharField(verbose_name='Температура транспортировки, ℃',
+                                      max_length=200, blank=True, null=True)
     use_relative_humidity = models.CharField(verbose_name='Относительная влажность при эксплуатации',
                                              max_length=200, blank=True, null=True)
     storage_transportation_relative_humidity = models.CharField(
         verbose_name='Относительная влажность при хранении/транспортировке', max_length=200, blank=True, null=True)
-    atmospheric_pressure_use_storage = models.CharField(verbose_name='Атмосферное давление при эксплуатации/хранении, кПа',
-                                                        max_length=200, blank=True, null=True)
-    atmospheric_pressure_transportation = models.CharField(verbose_name='Атмосферное давление при транспортировке, кПа',
-                                                           max_length=200, blank=True, null=True)
+    atmospheric_pressure_use_storage = models.CharField(
+        verbose_name='Атмосферное давление при эксплуатации/хранении, кПа', max_length=200, blank=True, null=True)
+    atmospheric_pressure_transportation = models.CharField(
+        verbose_name='Атмосферное давление при транспортировке, кПа', max_length=200, blank=True, null=True)
     pollution_level_use = models.CharField(verbose_name='Уровень загрязнения при эксплуатации',
                                            max_length=200, blank=True, null=True)
     pollution_level_storage = models.CharField(verbose_name='Уровень загрязнения при хранении',
@@ -181,6 +172,8 @@ class Series(models.Model):
     vibration = models.TextField(verbose_name='Вибрация', blank=True, null=True)
     impact_resistance = models.TextField(verbose_name='Ударопрочность', blank=True, null=True)
     mounting_position = models.CharField(verbose_name='Положение монтажа', max_length=200, blank=True, null=True)
+    wall_to_wall_installation = models.CharField(verbose_name='Монтаж "Стенка к стенке"',
+                                                 max_length=200, blank=True, null=True)
 
     PROTECTION_CHOICES = (
         ('IP20', 'IP20'),
@@ -189,6 +182,33 @@ class Series(models.Model):
     )
     protection_degree = models.CharField(verbose_name='Степень защиты', max_length=200, choices=PROTECTION_CHOICES
                                          , blank=True, null=True)
+
+    motor_cable_length = models.TextField(verbose_name='Максимальная длина кабеля двигателя', blank=True, null=True)
+    encoder_support = models.BooleanField(verbose_name='Подключение энкодера', blank=True, null=True)
+    pre_configurations = models.CharField(verbose_name='Предварительные конфигурации',
+                                          max_length=200, blank=True, null=True)
+    copy_backup_settings = models.BooleanField(verbose_name='Возможность копирования/бэкапа настроек'
+                                               , blank=True, null=True)
+    engine_cascade_control = models.CharField(verbose_name='Управление каскадом двигателей',
+                                              max_length=200, blank=True, null=True)
+    multi_pump_system = models.CharField(
+        verbose_name='Система Multi-pump (группа приводов-насосов подключенных по шине)',
+        max_length=200, blank=True, null=True)
+    pid_controller = models.IntegerField(verbose_name='Встроенный ПИД-регулятор', blank=True, null=True)
+    fire_mode = models.BooleanField(verbose_name='Пожарный режим', blank=True, null=True)
+    circuit_boards_protection = models.CharField(verbose_name='Защита печатных плат',
+                                                 max_length=200, blank=True, null=True)
+    sleep_mode = models.BooleanField(verbose_name='Спящий режим', blank=True, null=True)
+    flying_start = models.BooleanField(verbose_name='Подхват на ходу', blank=True, null=True)
+    skip_frequency = models.BooleanField(verbose_name='Пропуск критических частот', blank=True, null=True)
+    realtime_clock = models.BooleanField(verbose_name='Часы реального времени', blank=True, null=True)
+    quick_change_fans = models.BooleanField(verbose_name='Быстросъёмные вентиляторы', blank=True, null=True)
+    automatic_energy_saving = models.BooleanField(verbose_name='Автоматическое энергосбережение', blank=True, null=True)
+    io_expansion_boards = models.BooleanField(verbose_name='Платы расширения входов-выходов', blank=True, null=True)
+    removable_terminal_blocks = models.BooleanField(verbose_name='Съёмные клеммные колодки', blank=True, null=True)
+    dual_circuit_cooling = models.BooleanField(verbose_name='Двухконтурное охлаждение', blank=True, null=True)
+    sto_function = models.BooleanField(verbose_name='Функция STO (безопасного отключения момента)',
+                                       blank=True, null=True)
 
     description = models.TextField('Описание', blank=True, null=True)
     image = models.ImageField('Картинка', upload_to='images/', blank=True, null=True)
