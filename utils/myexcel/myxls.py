@@ -351,12 +351,17 @@ class Xlsx(Workbook):
         col_num = self.col_num_by_col_name(col_name)
         self.ws.cell(row=row, column=col_num).value = value
 
-    def img_to_col_with_name(self, col_name, img_path, row):
-        col_num = self.col_num_by_col_name(col_name)
+    # Image
+
+    def img_to_cell(self, row, col, img_path):
         img = openpyxl.drawing.image.Image(img_path)
-        img.anchor = f'{get_column_letter(col_num)}{row}'
+        img.anchor = f'{get_column_letter(col)}{row}'
         self.ws.add_image(img)
         del img
+
+    def img_to_col_with_name(self, col_name, img_path, row):
+        col_num = self.col_num_by_col_name(col_name)
+        self.img_to_cell(row, col_num, img_path)
 
 
 class XlsxFromTemplate(Xlsx):

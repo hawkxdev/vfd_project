@@ -1,5 +1,7 @@
 from xlsxwriter.utility import xl_col_to_name
 from api.vfd_api import series_power_list, get_supplier, get_series, get_vfd_by_params, get_price_vfd
+from utils.different import img_resize
+from utils.files import file_name_with_ext
 from utils.myexcel.myxls import Xlsx
 from vfd.models import Series
 
@@ -169,12 +171,19 @@ def create_compare_series(series):
     xlsx = Xlsx(filename, overwrite=True)
 
     for j, series_id in enumerate(series):
+        col = j + 2
         ser = Series.objects.get(id=series_id)
 
-        xlsx.ws.cell(row=1, column=j+2).value = ser.name
+        xlsx.ws.cell(row=1, column=col).value = ser.name
         xlsx.header_row_font(1)
 
-        xlsx.
+        xlsx.row_height(2, 50)
+        img_path = ser.image.path
+        new_img_path = f'upload/temp/{file_name_with_ext(img_path)}'
+        if img_resize(img_path=img_path, new_img_path=new_img_path, height=65):
+            xlsx.img_to_cell(2, col, new_img_path)
+
+
 
     xlsx.save()
     return filename
