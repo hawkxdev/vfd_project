@@ -84,30 +84,11 @@ class Category(models.Model):
 
 
 class Series(models.Model):
+    brand = models.ForeignKey(Brand, verbose_name='Бренд', on_delete=models.PROTECT)
     name = models.CharField('Название', max_length=200, unique=True)
     category = models.ForeignKey(Category, verbose_name='Категория', on_delete=models.PROTECT)
-    brand = models.ForeignKey(Brand, verbose_name='Бренд', on_delete=models.PROTECT)
-    applications = models.ManyToManyField(Application, verbose_name='Применения')
-    main_control_functions = models.TextField('Основные функции управления', blank=True, null=True)
-    power_outages = models.BooleanField(verbose_name='Преодоление провалов напряжения', blank=True, null=True)
-    io_expansion_boards = models.BooleanField(verbose_name='Платы расширения входов-выходов', blank=True, null=True)
-    pulse_frequency_setting = models.BooleanField('Импульсное задание частоты', blank=True, null=True)
-    control_panel_desc = models.TextField('Описание панели управления', blank=True, null=True)
-    control_panel_included = models.BooleanField('Панель управления в комплекте', blank=True, null=True)
-    encoder_support = models.BooleanField(verbose_name='Подключение энкодера', blank=True, null=True)
-    copy_backup_settings = models.BooleanField(verbose_name='Копирование/бэкап настроек', blank=True, null=True)
-    pid_controller = models.IntegerField(verbose_name='Встроенный ПИД-регулятор', blank=True, null=True)
-    fire_mode = models.BooleanField(verbose_name='Пожарный режим', blank=True, null=True)
-    sleep_mode = models.BooleanField(verbose_name='Спящий режим', blank=True, null=True)
-    flying_start = models.BooleanField(verbose_name='Подхват на ходу', blank=True, null=True)
-    skip_frequency = models.BooleanField(verbose_name='Пропуск критических частот', blank=True, null=True)
-    quick_change_fans = models.BooleanField(verbose_name='Быстросъёмные вентиляторы', blank=True, null=True)
-    automatic_energy_saving = models.BooleanField(verbose_name='Автоматическое энергосбережение', blank=True, null=True)
-    removable_terminal_blocks = models.BooleanField(verbose_name='Съёмные клеммные колодки', blank=True, null=True)
-    dual_circuit_cooling = models.BooleanField(verbose_name='Двухконтурное охлаждение', blank=True, null=True)
-    sto_function = models.BooleanField(verbose_name='Стандарт безопасности STO', blank=True, null=True)
-    description = models.TextField('Описание', blank=True, null=True)
     image = models.ImageField('Картинка', upload_to='images/', blank=True, null=True)
+    applications = models.ManyToManyField(Application, verbose_name='Применения')
 
     class Power(models.IntegerChoices):
         P1 = 1, '1x220В: 0.2...2.2кВт; 3x380В: 0.4...22кВт'
@@ -116,18 +97,25 @@ class Series(models.Model):
     power_range = models.PositiveSmallIntegerField(verbose_name='Диапазон мощностей',
                                                    choices=Power.choices, blank=True, null=True)
 
-    class Overload(models.IntegerChoices):
-        P1 = 1, 'Лёгкий режим: 120% 60с; Нормальный режим: 120% 60с, 160% 3с'
-        P2 = 2, 'Нормальный режим: 120% 60с, 150% 3с; Тяжелый режим: 150% 60с, 200% 3с'
-
-    overload_capacity = models.PositiveSmallIntegerField('Перегрузочная способность',
-                                                         choices=Overload.choices, blank=True, null=True)
-
     class ControlMethods(models.IntegerChoices):
-        C2 = 2, 'V/F (скалярное управление), SVC (бездатчиковое векторное управление)'
+        C2 = 2, 'V/F (скалярное управление), \nSVC (бездатчиковое векторное управление)'
 
     control_methods = models.PositiveSmallIntegerField(verbose_name='Методы управления',
                                                        choices=ControlMethods.choices, blank=True, null=True)
+
+    class MaximumFrequency(models.IntegerChoices):
+        F1 = 1, '599 Гц; 90 кВт и выше: 400 Гц'
+        F2 = 2, '599'
+
+    maximum_output_frequency = models.PositiveSmallIntegerField(verbose_name='Максимальная выходная частот, Гц',
+                                                                choices=MaximumFrequency.choices, blank=True, null=True)
+
+    class Overload(models.IntegerChoices):
+        P1 = 1, 'Лёгкий режим: 120% 60с; \nНормальный режим: 120% 60с, 160% 3с'
+        P2 = 2, 'Нормальный режим: 120% 60с, 150% 3с; \nТяжелый режим: 150% 60с, 200% 3с'
+
+    overload_capacity = models.PositiveSmallIntegerField('Перегрузочная способность',
+                                                         choices=Overload.choices, blank=True, null=True)
 
     class StartingTorque(models.IntegerChoices):
         S1 = 1, '150% / 3 Гц'
@@ -136,12 +124,32 @@ class Series(models.Model):
     starting_torque = models.PositiveSmallIntegerField('Пусковой момент', choices=StartingTorque.choices,
                                                        blank=True, null=True)
 
-    class MaximumFrequency(models.IntegerChoices):
-        F1 = 1, '599 Гц; 90 кВт и выше: 400 Гц'
-        F2 = 2, '599'
+    class MultiPump(models.IntegerChoices):
+        W1 = 1, 'Да, до 4 насосов'
+        W2 = 2, 'Да, до 8 насосов'
 
-    maximum_output_frequency = models.PositiveSmallIntegerField(verbose_name='Максимальная выходная частот, Гц',
-                                                                choices=MaximumFrequency.choices, blank=True, null=True)
+    multi_pump_system = models.PositiveSmallIntegerField(verbose_name='Много-насосный режим',
+                                                         choices=MultiPump.choices, blank=True, null=True)
+
+    class Cascade(models.IntegerChoices):
+        C1 = 1, 'Да, до 4 двигателей'
+        C2 = 2, 'Да, до 8 двигателей'
+
+    engine_cascade_control = models.PositiveSmallIntegerField(verbose_name='Управление каскадом двигателей',
+                                                              choices=Cascade.choices, blank=True, null=True)
+
+    class DifferentEngines(models.IntegerChoices):
+        D0 = 0, 'Нет'
+        D1 = 1, 'До 4 независимых групп параметров двигателя'
+
+    different_engines_work = models.PositiveSmallIntegerField(verbose_name='Работа с разными двигателями',
+                                                              choices=DifferentEngines.choices, blank=True, null=True)
+
+    fire_mode = models.BooleanField(verbose_name='Пожарный режим', blank=True, null=True)
+    sleep_mode = models.BooleanField(verbose_name='Спящий режим', blank=True, null=True)
+    flying_start = models.BooleanField(verbose_name='Подхват на ходу', blank=True, null=True)
+    skip_frequency = models.BooleanField(verbose_name='Пропуск критических частот', blank=True, null=True)
+    automatic_energy_saving = models.BooleanField(verbose_name='Автоматическое энергосбережение', blank=True, null=True)
 
     class EngineProtection(models.IntegerChoices):
         P1 = 1, 'Перегрузка по току, перенапряжение, перегрев, потеря фазы'
@@ -161,6 +169,8 @@ class Series(models.Model):
     automatic_start_after_power_loss = models.PositiveSmallIntegerField(
         'Автоматический запуск после пропадания питания', choices=AutomaticStart.choices, blank=True, null=True)
 
+    power_outages = models.BooleanField(verbose_name='Преодоление провалов напряжения', blank=True, null=True)
+
     class Leakage(models.IntegerChoices):
         L1 = 1, 'Уровень тока утечки более 50% от номинального тока ПЧ'
 
@@ -176,6 +186,9 @@ class Series(models.Model):
     inputs_outputs = models.PositiveSmallIntegerField(verbose_name='Входы/выходы',
                                                       choices=InputsOutputs.choices, blank=True, null=True)
 
+    io_expansion_boards = models.BooleanField(verbose_name='Платы расширения входов-выходов', blank=True, null=True)
+    pulse_frequency_setting = models.BooleanField('Импульсное задание частоты', blank=True, null=True)
+
     class ControlPanel(models.IntegerChoices):
         P1 = 1, 'Светодиодная 4-символьная'
         P2 = 2, 'Светодиодная 5-символьная'
@@ -184,6 +197,9 @@ class Series(models.Model):
     control_panel = models.PositiveSmallIntegerField('Панель управления', choices=ControlPanel.choices,
                                                      blank=True, null=True)
 
+    control_panel_desc = models.TextField('Описание панели управления', blank=True, null=True)
+    control_panel_included = models.BooleanField('Панель управления в комплекте', blank=True, null=True)
+
     class PanelAtDistance(models.IntegerChoices):
         P0 = 0, 'Нет'
         P1 = 1, 'Да, при помощи кабеля-аксессуара'
@@ -191,6 +207,15 @@ class Series(models.Model):
 
     control_panel_at_distance = models.PositiveSmallIntegerField('Выносной пульт',
                                                                  choices=PanelAtDistance.choices, blank=True, null=True)
+
+    class Configurations(models.IntegerChoices):
+        C1 = 1, 'Группировка параметров по применениям'
+
+    pre_configurations = models.PositiveSmallIntegerField(verbose_name='Предварительные конфигурации (Макросы)',
+                                                          choices=Configurations.choices, blank=True, null=True)
+
+    copy_backup_settings = models.BooleanField(verbose_name='Копирование/бэкап настроек', blank=True, null=True)
+    pid_controller = models.IntegerField(verbose_name='Встроенный ПИД-регулятор', blank=True, null=True)
 
     class Communications(models.IntegerChoices):
         C0 = 0, 'Нет'
@@ -207,6 +232,30 @@ class Series(models.Model):
     additional_communications = models.PositiveSmallIntegerField('Дополнительные протоколы связи',
                                                                  choices=AdditionalCommunications.choices,
                                                                  blank=True, null=True)
+
+    class Plc(models.IntegerChoices):
+        PO = 0, 'Нет'
+        P2 = 2, 'ПЛК на 2000 шагов'
+        P3 = 3, 'ПЛК на 10000 шагов'
+
+    built_in_plc = models.PositiveSmallIntegerField(verbose_name='Встроенный ПЛК',
+                                                    choices=Plc.choices, blank=True, null=True)
+
+    encoder_support = models.BooleanField(verbose_name='Подключение энкодера', blank=True, null=True)
+    sto_function = models.BooleanField(verbose_name='Стандарт безопасности STO', blank=True, null=True)
+
+    class ExternalPower(models.IntegerChoices):
+        P1 = 1, 'Опциональная плата'
+
+    external_power_24v = models.PositiveSmallIntegerField(verbose_name='Подключение внешнего питания +24В',
+                                                          choices=ExternalPower.choices, blank=True, null=True)
+
+    class Usb(models.IntegerChoices):
+        U0 = 0, 'Нет'
+        U1 = 1, 'Есть (загрузка и выгрузка даже без включения питания)'
+
+    built_in_usb = models.PositiveSmallIntegerField(verbose_name='Встроенный порт USB',
+                                                    choices=Usb.choices, blank=True, null=True)
 
     class EmcFilter(models.IntegerChoices):
         NO = 0, 'Нет'
@@ -232,17 +281,22 @@ class Series(models.Model):
     brake_interrupter = models.PositiveSmallIntegerField(verbose_name='Тормозной прерыватель',
                                                          choices=BrakeInterrupter.choices, blank=True, null=True)
 
-    class Plc(models.IntegerChoices):
-        PO = 0, 'Нет'
-        P2 = 2, 'ПЛК на 2000 шагов'
-        P3 = 3, 'ПЛК на 10000 шагов'
+    class MotorCable(models.IntegerChoices):
+        D1 = 1, 'Без дросселя: экран.кабель 35...100м в зависимости от номинала; неэкран. 50...150м. \n' \
+                'С дросселем: экран.кабель 50...150м; неэкран. 90...225м'
+        D2 = 2, 'Без дросселя: экран.кабель 50...150м в зависимости от номинала; неэкран. 75...225м. \n' \
+                'С дросселем: экран.кабель 75...225м; неэкран. 115...325м'
 
-    built_in_plc = models.PositiveSmallIntegerField(verbose_name='Встроенный ПЛК',
-                                                    choices=Plc.choices, blank=True, null=True)
+    motor_cable_length = models.PositiveSmallIntegerField(verbose_name='Максимальная длина кабеля двигателя',
+                                                          choices=MotorCable.choices, blank=True, null=True)
+
+    quick_change_fans = models.BooleanField(verbose_name='Быстросъёмные вентиляторы', blank=True, null=True)
+    removable_terminal_blocks = models.BooleanField(verbose_name='Съёмные клеммные колодки', blank=True, null=True)
+    dual_circuit_cooling = models.BooleanField(verbose_name='Двухконтурное охлаждение', blank=True, null=True)
 
     class OperatingTemp(models.IntegerChoices):
-        T10_40_50_60 = 1, '-10...+40(+50); Со снижением характеристик -10...+60'
-        T20_50_60 = 2, '-20...+50; Со снижением характеристик -20...+60'
+        T10_40_50_60 = 1, '-10...+40(+50); \nСо снижением характеристик -10...+60'
+        T20_50_60 = 2, '-20...+50; \nСо снижением характеристик -20...+60'
 
     operating_temp = models.PositiveSmallIntegerField(verbose_name='Рабочая температура, ℃',
                                                       choices=OperatingTemp.choices, blank=True, null=True)
@@ -267,18 +321,11 @@ class Series(models.Model):
                                                              choices=Altitude.choices, blank=True, null=True)
 
     class WallToWall(models.IntegerChoices):
-        W1 = 1, 'Допускается для типоразмеров D0 и выше; типоразмеры A-C: зазор 10мм'
-        W2 = 2, 'Допускается при макс.окруж.темп. до -40℃, до -50℃ со снижением характеристик'
+        W1 = 1, 'Допускается для ПЧ от 45 кВт включительно; \nДо 45 кВт: зазор 10мм'
+        W2 = 2, 'Допускается при макс.окруж.темп. до -40℃, \nдо -50℃ со снижением характеристик'
 
     wall_to_wall_installation = models.PositiveSmallIntegerField(verbose_name='Монтаж "Стенка к стенке"',
                                                                  choices=WallToWall.choices, blank=True, null=True)
-
-    class DifferentEngines(models.IntegerChoices):
-        D0 = 0, 'Нет'
-        D1 = 1, 'До 4 независимых групп параметров двигателя'
-
-    different_engines_work = models.PositiveSmallIntegerField(verbose_name='Работа с разными двигателями',
-                                                              choices=DifferentEngines.choices, blank=True, null=True)
 
     class ProtectionDegree(models.IntegerChoices):
         D1 = 1, 'IP20'
@@ -288,35 +335,6 @@ class Series(models.Model):
     protection_degree = models.PositiveSmallIntegerField(verbose_name='Степень защиты',
                                                          choices=ProtectionDegree.choices, blank=True, null=True)
 
-    class MotorCable(models.IntegerChoices):
-        D1 = 1, 'Без дросселя: экран.кабель 35...100м в зависимости от номинала; неэкран. 50...150м. ' \
-                'С дросселем: экран.кабель 50...150м; неэкран. 90...225м'
-        D2 = 2, 'Без дросселя: экран.кабель 50...150м в зависимости от номинала; неэкран. 75...225м. ' \
-                'С дросселем: экран.кабель 75...225м; неэкран. 115...325м'
-
-    motor_cable_length = models.PositiveSmallIntegerField(verbose_name='Максимальная длина кабеля двигателя',
-                                                          choices=MotorCable.choices, blank=True, null=True)
-
-    class Configurations(models.IntegerChoices):
-        C1 = 1, 'Группировка параметров по применениям'
-
-    pre_configurations = models.PositiveSmallIntegerField(verbose_name='Предварительные конфигурации (Макросы)',
-                                                          choices=Configurations.choices, blank=True, null=True)
-
-    class MultiPump(models.IntegerChoices):
-        W1 = 1, 'Да, до 4 насосов'
-        W2 = 2, 'Да, до 8 насосов'
-
-    multi_pump_system = models.PositiveSmallIntegerField(verbose_name='Много-насосный режим',
-                                                         choices=MultiPump.choices, blank=True, null=True)
-
-    class Cascade(models.IntegerChoices):
-        C1 = 1, 'Да, до 4 двигателей'
-        C2 = 2, 'Да, до 8 двигателей'
-
-    engine_cascade_control = models.PositiveSmallIntegerField(verbose_name='Управление каскадом двигателей',
-                                                              choices=Cascade.choices, blank=True, null=True)
-
     class BoardsProtection(models.IntegerChoices):
         P0 = 0, 'Нет'
         P1 = 1, 'Специальное покрытие печатных плат'
@@ -325,18 +343,9 @@ class Series(models.Model):
                                                                  choices=BoardsProtection.choices,
                                                                  blank=True, null=True)
 
-    class ExternalPower(models.IntegerChoices):
-        P1 = 1, 'Опциональная плата'
+    main_control_functions = models.TextField('Основные функции управления', blank=True, null=True)
 
-    external_power_24v = models.PositiveSmallIntegerField(verbose_name='Подключение внешнего питания +24В',
-                                                          choices=ExternalPower.choices, blank=True, null=True)
-
-    class Usb(models.IntegerChoices):
-        U0 = 0, 'Нет'
-        U1 = 1, 'Есть (загрузка и выгрузка даже без включения питания)'
-
-    built_in_usb = models.PositiveSmallIntegerField(verbose_name='Встроенный порт USB',
-                                                    choices=Usb.choices, blank=True, null=True)
+    description = models.TextField('Описание', blank=True, null=True)
 
     def __str__(self):
         return str(f'{self.brand} {self.name}')

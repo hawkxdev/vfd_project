@@ -1,3 +1,4 @@
+import numpy as np
 from xlsxwriter.utility import xl_col_to_name
 from api.vfd_api import series_power_list, get_supplier, get_series, get_vfd_by_params, get_price_vfd
 from utils.different import img_resize
@@ -164,26 +165,93 @@ def create_compare_price():
 
 
 def create_compare_series(series):
-    # print(series)
-    series = ['15', '14']
+    print(f'{series = }')
+    # series = ['15', '14']
 
     filename = 'upload/compare_series.xlsx'
     xlsx = Xlsx(filename, overwrite=True)
+
+    xlsx.column_width(1, 42)
+    xlsx.row_height(1, 70)
+
+    arr = []
 
     for j, series_id in enumerate(series):
         col = j + 2
         ser = Series.objects.get(id=series_id)
 
-        xlsx.ws.cell(row=1, column=col).value = ser.name
+        arr.append([])
+
+        xlsx.column_width(col, 40)
+
+        xlsx.ws.cell(row=1, column=col).value = f'{ser.brand.name} {ser.name}'
         xlsx.header_row_font(1)
 
-        xlsx.row_height(2, 50)
         img_path = ser.image.path
         new_img_path = f'upload/temp/{file_name_with_ext(img_path)}'
-        if img_resize(img_path=img_path, new_img_path=new_img_path, height=65):
-            xlsx.img_to_cell(2, col, new_img_path)
+        if img_resize(img_path=img_path, new_img_path=new_img_path, height=90):
+            xlsx.img_to_cell(1, col, new_img_path, 3.8, 0.1)
 
+        row = 2
+        for field in Series._meta.get_fields():
+            cell = xlsx.ws.cell(row=row, column=col)
 
+            if field.name not in ['id', 'name', 'brand', 'frequencydrive', 'accessory', 'image', 'applications',
+                                  'description']:
+                xlsx.cell_alignment(row, col, horizontal='left', vertical='top', wrap_text=True)
+                xlsx.cell_alignment(row, 1, horizontal='left', vertical='top', wrap_text=True)
+
+                xlsx.ws.cell(row=row, column=1).value = field.verbose_name
+                xlsx.cell_bold(row, 1)
+                # xlsx.ws.cell(row=row, column=4).value = field.name
+
+                value = getattr(ser, field.name, None)
+                try:
+                    if field.choices:
+                        filtered = list(filter(lambda x: x[0] == value, field.choices))
+                        label = filtered[0][1]
+                        cell.value = label
+
+                        arr[j].append(int(value))
+                    else:
+                        if value in [True, False]:
+                            cell.value = 'Да' if value else 'Нет'
+                            arr[j].append(1 if value else 0)
+                        else:
+                            cell.value = value
+                            arr[j].append(0)
+                except:
+                    if field.name == 'category':
+                        cell.value = ser.category.name
+                    # elif field.name == 'applications':
+                    #     s = ', '.join(list(ser.applications.values_list('name', flat=True)))
+                    #     cell.value = s
+                row += 1
+
+    arr = np.array(arr)
+    arr = np.swapaxes(arr, 0, 1)
+    # print(arr, np.size(arr, 0))
+
+    cols_rating = []
+
+    for row, x in enumerate(arr):
+        average = sum(x) / len(x)
+        for col, y in enumerate(x):
+            if y > average:
+                xlsx.cell_background(row + 3, col + 2, 'LightGreen')
+                cols_rating.append(col + 2)
+
+    unique_cols = list(set(cols_rating))
+    col_counts_in_rating = []
+
+    for col in unique_cols:
+        count = len(list(filter(lambda k: k == col, cols_rating)))
+        col_counts_in_rating.append(count)
+
+    max_count = max(col_counts_in_rating)
+    for i, col in enumerate(unique_cols):
+        if col_counts_in_rating[i] == max_count:
+            xlsx.cell_background(1, col, 'LightGreen')
 
     xlsx.save()
     return filename

@@ -3,8 +3,11 @@ import openpyxl
 from pathlib import Path
 from colour import Color
 from openpyxl import Workbook, load_workbook
+from openpyxl.drawing.spreadsheet_drawing import AnchorMarker, OneCellAnchor
+from openpyxl.drawing.xdr import XDRPositiveSize2D
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter, column_index_from_string
+from openpyxl.utils.units import cm_to_EMU, pixels_to_EMU
 from xlrd import XLRDError
 from utils.files import open_file
 from utils.mylogging import error
@@ -266,6 +269,11 @@ class Xlsx(Workbook):
             self.ws.column_dimensions[col].width = adjusted_width
         return self
 
+    def column_width(self, col: int, width: float):
+        column_letter = get_column_letter(col)
+        self.ws.column_dimensions[column_letter].width = width
+        return self
+
     def columns_width(self, cols: any, width: float = 8):
         list_cols = self.convert_cols_arg_to_list_cols(cols)
         for col in list_cols:
@@ -274,6 +282,14 @@ class Xlsx(Workbook):
 
     def row_height(self, row, height):
         self.ws.row_dimensions[row].height = height
+        return self
+
+    def cell_bold(self, row, col):
+        self.ws.cell(row=row, column=col).font = Font(bold=True)
+
+    def cell_alignment(self, row, col, horizontal: str = 'center', vertical: str = 'center', wrap_text: bool = True):
+        self.ws.cell(row=row, column=col).alignment = \
+            Alignment(horizontal=horizontal, vertical=vertical, wrap_text=wrap_text)
         return self
 
     def columns_alignment(self, cols: any, horizontal: str = 'center', vertical: str = 'center',
@@ -303,6 +319,10 @@ class Xlsx(Workbook):
             if alignment:
                 cell.alignment = alignment
         return self
+
+    def cell_background(self, row, col, color):
+        col_hex = Color(color).hex_l[1:]
+        self.ws.cell(row=row, column=col).fill = PatternFill(start_color=col_hex, end_color=col_hex, fill_type='solid')
 
     def last_row_background_color(self, color_hex: str):
         my_fill = PatternFill(start_color=color_hex, end_color=color_hex, fill_type='solid')
@@ -353,9 +373,22 @@ class Xlsx(Workbook):
 
     # Image
 
-    def img_to_cell(self, row, col, img_path):
+    def img_to_cell(self, row, col, img_path, coloffset=0.1, rowoffset=0.1):
         img = openpyxl.drawing.image.Image(img_path)
         img.anchor = f'{get_column_letter(col)}{row}'
+
+        p2e = pixels_to_EMU
+        h, w = img.height, img.width
+        size = XDRPositiveSize2D(p2e(w), p2e(h))
+
+        c2e = cm_to_EMU
+        cellh = lambda x: c2e((x * 49.77) / 99)
+        cellw = lambda x: c2e((x * (18.65 - 1.71)) / 10)
+        coloffset = cellw(coloffset)
+        rowoffset = cellh(rowoffset)
+        marker = AnchorMarker(col=col - 1, colOff=coloffset, row=row - 1, rowOff=rowoffset)
+        img.anchor = OneCellAnchor(_from=marker, ext=size)
+
         self.ws.add_image(img)
         del img
 
