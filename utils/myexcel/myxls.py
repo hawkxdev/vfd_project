@@ -1,4 +1,3 @@
-import os
 import xlrd
 import openpyxl
 from pathlib import Path
@@ -7,7 +6,7 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter, column_index_from_string
 from xlrd import XLRDError
-from utils.files import directory_path, open_file
+from utils.files import open_file
 from utils.mylogging import error
 from utils.progress_count import ProgressCount
 
@@ -273,6 +272,10 @@ class Xlsx(Workbook):
             self.ws.column_dimensions[col].width = width
         return self
 
+    def row_height(self, row, height):
+        self.ws.row_dimensions[row].height = height
+        return self
+
     def columns_alignment(self, cols: any, horizontal: str = 'center', vertical: str = 'center',
                           wrap_text: bool = True):
         list_cols = self.convert_cols_arg_to_list_cols(cols)
@@ -326,6 +329,34 @@ class Xlsx(Workbook):
         wb.ws = wb.active
         wb.filename = filename
         return wb
+
+    def col_names(self):
+        names = []
+        for col in range(1, self.ws.max_column + 1):
+            names.append(self.ws.cell(row=1, column=col).value)
+        if names == [None]:
+            names = []
+        return names
+
+    def col_num_by_col_name(self, col_name):
+        col_names = self.col_names()
+        if col_name in col_names:
+            col_num = col_names.index(col_name) + 1
+        else:
+            col_num = len(col_names) + 1
+            self.ws.cell(row=1, column=col_num).value = col_name
+        return col_num
+
+    def to_col_with_name(self, col_name, value, row):
+        col_num = self.col_num_by_col_name(col_name)
+        self.ws.cell(row=row, column=col_num).value = value
+
+    def img_to_col_with_name(self, col_name, img_path, row):
+        col_num = self.col_num_by_col_name(col_name)
+        img = openpyxl.drawing.image.Image(img_path)
+        img.anchor = f'{get_column_letter(col_num)}{row}'
+        self.ws.add_image(img)
+        del img
 
 
 class XlsxFromTemplate(Xlsx):

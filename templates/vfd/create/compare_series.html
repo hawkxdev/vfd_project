@@ -4,8 +4,9 @@
 
     <form action="" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" class="btn btn-primary">
+        <p>{{ form.series.label }}:</p>
+        <p>{{ form.series }}</p>
+        <p><input type="submit" class="btn btn-primary"></p>
     </form>
 
     <script>
@@ -27,4 +28,4 @@
 
 {% endblock content_create %}
 
-{% block num_li_nav %} 1 {% endblock num_li_nav %}
+{% block num_li_nav %} 2 {% endblock num_li_nav %}

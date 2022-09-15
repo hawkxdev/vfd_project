@@ -1,7 +1,8 @@
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import render, redirect
-
-from api.create_files_api import create_compare_price
+from api.create_files_api import create_compare_price, create_compare_series
 from api.import_api import import_file
+from utils.files import file_name_with_ext
 from vfd import forms
 
 
@@ -36,11 +37,26 @@ def create_compare_price_view(request):
     if request.method == 'POST':
         form = forms.CreateComparePriceForm(request.POST)
         if form.is_valid():
-            supplier = request.POST.get('supplier', )
-            # print(supplier)
+            supplier = request.POST.get('supplier', None)
             create_compare_price()
             return redirect('/create/compare-price/')
     else:
         form = forms.CreateComparePriceForm()
 
     return render(request, 'vfd/create/compare.html', {'form': form})
+
+
+def compare_series(request):
+    if request.method == 'POST':
+        form = forms.CompareSeries(request.POST)
+        if form.is_valid():
+            series = request.POST.getlist('series')
+            filename = create_compare_series(series)
+            response = HttpResponse(open(filename, "rb"),
+                                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{file_name_with_ext(filename)}"'
+            return response
+    else:
+        form = forms.CompareSeries()
+
+    return render(request, 'vfd/create/compare_series.html', {'form': form})

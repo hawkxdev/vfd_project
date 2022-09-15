@@ -1,6 +1,7 @@
 from xlsxwriter.utility import xl_col_to_name
 from api.vfd_api import series_power_list, get_supplier, get_series, get_vfd_by_params, get_price_vfd
 from utils.myexcel.myxls import Xlsx
+from vfd.models import Series
 
 
 class ComparisonZone:
@@ -158,3 +159,22 @@ def create_compare_price():
 
     xlsx.width_auto() \
         .save_and_open()
+
+
+def create_compare_series(series):
+    # print(series)
+    series = ['15', '14']
+
+    filename = 'upload/compare_series.xlsx'
+    xlsx = Xlsx(filename, overwrite=True)
+
+    for j, series_id in enumerate(series):
+        ser = Series.objects.get(id=series_id)
+
+        xlsx.ws.cell(row=1, column=j+2).value = ser.name
+        xlsx.header_row_font(1)
+
+        xlsx.
+
+    xlsx.save()
+    return filename

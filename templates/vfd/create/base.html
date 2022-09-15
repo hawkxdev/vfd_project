@@ -15,7 +15,7 @@
         $(document).ready(function () {
             let i = 1
             $('.navbar').find('li').each(function () {
-                if (i !== {% block num_li_sales_nav %} {% endblock num_li_sales_nav %}) {
+                if (i !== {% block num_li_nav %} {% endblock num_li_nav %}) {
                     $(this).find('a').removeClass('active')
                 } else {
                     $(this).find('a').addClass('active')
