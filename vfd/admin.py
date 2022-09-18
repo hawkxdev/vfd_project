@@ -5,12 +5,10 @@ from vfd.models import *
 
 admin.site.register(Country)
 admin.site.register(EquipmentLine)
-admin.site.register(Brand)
 admin.site.register(Application)
 admin.site.register(Category)
 admin.site.register(FrequencyDrive)
 admin.site.register(Supplier)
-admin.site.register(Price)
 admin.site.register(AccessoryType)
 admin.site.register(Accessory)
 
@@ -20,7 +18,7 @@ class SeriesAdmin(admin.ModelAdmin):
     """Серии ПЧ"""
     list_display = ('brand', 'name')
     list_filter = ('brand', 'name')
-    readonly_fields = ('get_image',)
+    readonly_fields = ('get_image', 'id')
     save_on_top = True
 
     fieldsets = (
@@ -34,14 +32,13 @@ class SeriesAdmin(admin.ModelAdmin):
             'fields': (('power_range',),)
         }),
         ('Характеристики управления', {
-            'fields': (('control_methods', 'maximum_output_frequency', 'overload_capacity', 'starting_torque',
+            'fields': (('control_methods', 'motors', 'maximum_output_frequency', 'overload_capacity', 'starting_torque',
                         'main_control_functions', 'multi_pump_system', 'engine_cascade_control',
                         'different_engines_work', 'fire_mode', 'sleep_mode', 'flying_start', 'skip_frequency',
                         'automatic_energy_saving'),)
         }),
         ('Характеристики защиты', {
-            'fields': (('engine_protection', 'stop_prevention', 'automatic_start_after_power_loss', 'power_outages',
-                        'current_leakage_protection'),)
+            'fields': (('engine_protection', 'stop_prevention', 'automatic_start_after_power_loss'),)
         }),
         ('Плата управления', {
             'fields': (('inputs_outputs', 'io_expansion_boards', 'pulse_frequency_setting'),)
@@ -61,7 +58,7 @@ class SeriesAdmin(admin.ModelAdmin):
                         'wall_to_wall_installation', 'protection_degree', 'circuit_boards_protection'),)
         }),
         ('Описание', {
-            'fields': (('description',),)
+            'fields': (('description', 'id'),)
         }),
     )
 
@@ -74,3 +71,40 @@ class SeriesAdmin(admin.ModelAdmin):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields['control_panel_desc'].widget.attrs['style'] = 'width: 45em; height: 4em;'
         return form
+
+
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    """Бренды ПЧ"""
+    readonly_fields = ('get_image',)
+
+    def get_image(self, obj):
+        return mark_safe(f'<img src={obj.logo.url} width="70">')
+
+    get_image.short_description = 'Картинка'
+
+
+@admin.register(Price)
+class PriceAdmin(admin.ModelAdmin):
+    """Цены на ПЧ"""
+    list_display = ('get_brand', 'frequency_drive', 'accessory', 'get_power', 'price', 'get_currency', 'supplier')
+    list_filter = ('supplier', 'frequency_drive__series__brand', 'frequency_drive__series')
+    list_display_links = ('frequency_drive', 'accessory', 'get_power')
+
+    def get_brand(self, obj):
+        if obj.frequency_drive:
+            return f'{obj.frequency_drive.series.brand}'
+        elif obj.accessory:
+            return f'{obj.accessory.series.first().brand}'
+
+    def get_power(self, obj):
+        if obj.frequency_drive:
+            return f'{obj.frequency_drive.power}'
+
+    def get_currency(self, obj):
+        if obj.frequency_drive or obj.accessory:
+            return f'{obj.supplier.currency}'
+
+    get_brand.short_description = 'Бренд'
+    get_power.short_description = 'Мощность'
+    get_currency.short_description = 'Валюта'

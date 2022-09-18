@@ -206,29 +206,37 @@ def create_compare_series(series):
                 # xlsx.ws.cell(row=row, column=4).value = field.name
 
                 value = getattr(ser, field.name, None)
-                try:
-                    if field.choices:
-                        filtered = list(filter(lambda x: x[0] == value, field.choices))
-                        label = filtered[0][1]
-                        cell.value = label
 
-                        arr[j].append(int(value))
-                    else:
-                        if value in [True, False]:
-                            cell.value = 'Да' if value else 'Нет'
-                            arr[j].append(1 if value else 0)
-                        else:
-                            cell.value = value
-                            arr[j].append(0)
-                except:
+                if value is None:
+                    cell.value = 'Нет информации'
+                    arr[j].append(0)
+                else:
                     if field.name == 'category':
                         cell.value = ser.category.name
+                    else:
+                        if field.choices:
+                            filtered = list(filter(lambda x: x[0] == value, field.choices))
+                            label = filtered[0][1]
+                            cell.value = label
+                            if value < 10:
+                                arr[j].append(int(value))
+                            else:
+                                arr[j].append(int(value / 10))
+                        else:
+                            if value in [True, False]:
+                                cell.value = 'Да' if value else 'Нет'
+                                arr[j].append(1 if value else 0)
+                            else:
+                                cell.value = value
+                                arr[j].append(0)
                     # elif field.name == 'applications':
                     #     s = ', '.join(list(ser.applications.values_list('name', flat=True)))
                     #     cell.value = s
                 row += 1
 
+    print(arr)
     arr = np.array(arr)
+    print(arr)
     arr = np.swapaxes(arr, 0, 1)
     # print(arr, np.size(arr, 0))
 
