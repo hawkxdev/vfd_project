@@ -1,5 +1,4 @@
 import pandas as pd
-
 from api.vfd_api import get_vfd, get_accessory
 from vfd.models import FrequencyDrive, Accessory, Price
 

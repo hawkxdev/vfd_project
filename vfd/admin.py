@@ -7,8 +7,6 @@ admin.site.register(Country)
 admin.site.register(EquipmentLine)
 admin.site.register(Application)
 admin.site.register(Category)
-admin.site.register(FrequencyDrive)
-admin.site.register(Supplier)
 admin.site.register(AccessoryType)
 admin.site.register(Accessory)
 
@@ -108,3 +106,16 @@ class PriceAdmin(admin.ModelAdmin):
     get_brand.short_description = 'Бренд'
     get_power.short_description = 'Мощность'
     get_currency.short_description = 'Валюта'
+
+
+@admin.register(Supplier)
+class SupplierAdmin(admin.ModelAdmin):
+    """Поставщики"""
+    readonly_fields = ('id',)
+
+
+@admin.register(FrequencyDrive)
+class FrequencyDriveAdmin(admin.ModelAdmin):
+    """ПЧ"""
+    list_display = ('article', 'power', 'current', 'voltage', 'series')
+    list_filter = ('series__brand', 'series')

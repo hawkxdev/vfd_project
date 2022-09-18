@@ -366,15 +366,7 @@ class FrequencyDrive(models.Model):
     article = models.CharField('Артикул', max_length=30, unique=True)
     name = models.CharField('Наименование', max_length=200, blank=True, null=True)
     series = models.ForeignKey(Series, verbose_name='Серия', on_delete=models.PROTECT, blank=False, null=False)
-    POWER_CHOICES = (
-        (2.2, '2.2'),
-        (7.5, '7.5'),
-        (22, 22),
-        (45, 45),
-        (110, 110),
-        (250, 250),
-    )
-    power = models.FloatField('Мощность', choices=POWER_CHOICES)
+    power = models.FloatField('Мощность')
     current = models.FloatField('Ток')
     VOLT_CHOICES = (
         (400, 400),
