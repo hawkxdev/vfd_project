@@ -3,7 +3,6 @@ from django.utils.safestring import mark_safe
 
 from vfd.models import *
 
-admin.site.register(Country)
 admin.site.register(EquipmentLine)
 admin.site.register(Application)
 admin.site.register(Category)
