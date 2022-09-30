@@ -36,14 +36,9 @@ def create_compare_price():
     #     Block((8, 12, 15)),
     # ]
 
-    comparison_zone.suppliers = [8, 6]
+    comparison_zone.suppliers = [9, 6, 8]
     comparison_zone.blocks = [
-        Block((24, 19)),
-        Block((24, 20)),
-        Block((26, 20)),
-        Block((26, 21)),
-        Block((25, 21)),
-        Block((25, 22)),
+        Block((29, 19, 24)),
     ]
 
     eur_rub = 59.81
