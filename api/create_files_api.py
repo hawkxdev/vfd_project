@@ -36,14 +36,65 @@ def create_compare_price():
     #     Block((8, 12, 15)),
     # ]
 
-    comparison_zone.suppliers = [9, 6, 8]
-    comparison_zone.blocks = [
-        Block((29, 19, 24)),
-    ]
+    comparison_zone.suppliers = [9, 6, 10, 8, 3, 5, 12, 13]
+    # 	Delixi Hangzhou Inverter Co LTD	9
+    # 	HNC Electric Limited	6
+    # 	Rievtech Electronic Co Ltd	10
+    # 	FGI Science And Technology Co., Ltd	8
+    # 	ИЭК ХОЛДИНГ ООО (РБ)	3
+    # 	Delta Electronics (NL)	5
+    #   INVT Electric Co., Ltd  12
+    #   Магоста-Групп ООО	13
 
-    eur_rub = 59.81
-    eur_usd = 1.00
-    usd_rub = 59.84
+    comparison_zone.blocks = [
+        Block((29, 19, 34, 24, 9, 13, 36, 37)),
+        Block((31, 19, 34, 26, 7, 14, 1, 38)),
+        Block((30, 20, 34, 26, 7, 15, 3, 38)),
+        Block((33, 22, 35, 25, 6, 16, 4, 38)),
+    ]
+    # 	Delixi	EM60	31
+    # 	Delixi	E100	30
+    # 	Delixi	E102	32
+    # 	Delixi	E180	33
+    #   Delixi	D200	29
+
+    # 	HNC Electric	HV10	19
+    # 	HNC Electric	HV100	20
+    # 	HNC Electric	HV390	23
+    # 	HNC Electric	HV480	21
+    # 	HNC Electric	HV610	22
+
+    # 	Rievtech	RI3000	34
+    # 	Rievtech	RI9000	35
+
+    # 	FGI	FG10/FG20	24
+    #   FGI	FD300	25
+    # 	FGI	FG30	26
+
+    # 	IEK (ONI)	A150	9
+    # 	IEK (ONI)	A310	7
+    # 	IEK (ONI)	L620	8
+    # 	IEK (ONI)	A650	6
+    # 	IEK (ONI)	K750	10
+
+    # 	Delta	ME300	13
+    #   Delta	CFP2000	17
+    # 	Delta	CP2000	15
+    # 	Delta	CP2000-C2	16
+    # 	Delta	MS300	14
+
+    #   INVT	GD10	36
+    # 	INVT	GD20	1
+    # 	INVT	GD200A	3
+    # 	INVT	GD350A	4
+    # 	INVT	GD350A-IP55	5
+
+    #   Canroon	CV800	37
+    # 	Canroon	CV900	38
+
+    eur_rub = 55.96
+    eur_usd = 0.97
+    usd_rub = 57.93
 
     xlsx = Xlsx('upload/compare.xlsx', overwrite=True)
     row = 1
@@ -161,7 +212,9 @@ def create_compare_price():
 
 def create_compare_series(series):
     print(f'{series = }')
-    # series = ['15', '14']
+    # series = ['36', '9', '13', '19', '24', '29', '34', '37']
+    # series = ['11', '19', '20']
+    series = ['11', '13', '14', '19', '20']
 
     filename = 'upload/compare_series.xlsx'
     xlsx = Xlsx(filename, overwrite=True)
@@ -170,10 +223,12 @@ def create_compare_series(series):
     xlsx.row_height(1, 70)
 
     arr = []
+    max_row = None
 
     for j, series_id in enumerate(series):
         col = j + 2
         ser = Series.objects.get(id=series_id)
+        print(f'{ser.brand} {ser.name} {ser.id}')
 
         arr.append([])
 
@@ -218,20 +273,21 @@ def create_compare_series(series):
                             else:
                                 arr[j].append(int(value / 10))
                         else:
-                            if value in [True, False]:
+                            if isinstance(value, bool):
                                 cell.value = 'Да' if value else 'Нет'
                                 arr[j].append(1 if value else 0)
                             else:
                                 cell.value = value
-                                arr[j].append(0)
+                                arr[j].append(value)
                     # elif field.name == 'applications':
                     #     s = ', '.join(list(ser.applications.values_list('name', flat=True)))
                     #     cell.value = s
                 row += 1
+        max_row = row
 
-    print(arr)
+    # print(arr)
     arr = np.array(arr)
-    print(arr)
+    # print(arr)
     arr = np.swapaxes(arr, 0, 1)
     # print(arr, np.size(arr, 0))
 
@@ -255,6 +311,7 @@ def create_compare_series(series):
     for i, col in enumerate(unique_cols):
         if col_counts_in_rating[i] == max_count:
             xlsx.cell_background(1, col, 'LightGreen')
+        xlsx.ws.cell(row=max_row, column=col).value = col_counts_in_rating[i]
 
     xlsx.save()
     return filename

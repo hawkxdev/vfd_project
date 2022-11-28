@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'supplier.apps.SupplierConfig',
     'vfd.apps.VfdConfig',
     'ips.apps.IpsConfig',
+    'ss.apps.SSConfig',
 ]
 
 MIDDLEWARE = [

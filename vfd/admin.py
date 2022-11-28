@@ -13,7 +13,7 @@ admin.site.register(Accessory)
 @admin.register(Series)
 class SeriesAdmin(admin.ModelAdmin):
     """Серии ПЧ"""
-    list_display = ('brand', 'name')
+    list_display = ('brand', 'name', 'id')
     list_filter = ('brand', 'name')
     list_display_links = ('brand', 'name')
     readonly_fields = ('get_image', 'id')
@@ -34,7 +34,7 @@ class SeriesAdmin(admin.ModelAdmin):
             'fields': (('control_methods', 'motors', 'maximum_output_frequency', 'overload_capacity', 'starting_torque',
                         'carrier_frequency', 'multi_pump_system',
                         'different_engines_work', 'fire_mode', 'sleep_mode', 'flying_start', 'skip_frequency',
-                        'automatic_energy_saving'),)
+                        'automatic_energy_saving', 'cooling_fan_control'),)
         }),
         ('Характеристики защиты', {
             'fields': (('engine_protection', 'stop_prevention', 'automatic_start_after_power_loss'),)
@@ -54,7 +54,8 @@ class SeriesAdmin(admin.ModelAdmin):
         }),
         ('Условия эксплуатации, хранения и транспортировки', {
             'fields': (('operating_temp', 'use_relative_humidity', 'installation_altitude', 'wall_to_wall_installation',
-                        'railway_mounting', 'protection_degree', 'circuit_boards_protection'),)
+                        'railway_mounting', 'protection_degree', 'circuit_boards_protection', 'minimum_size',
+                        'package_set', 'case_quality'),)
         }),
         ('Описание', {
             'fields': (('description', 'id'),)
@@ -112,6 +113,7 @@ class PriceAdmin(admin.ModelAdmin):
 @admin.register(Supplier)
 class SupplierAdmin(admin.ModelAdmin):
     """Поставщики"""
+    list_display = ('name', 'id')
     readonly_fields = ('id',)
 
 

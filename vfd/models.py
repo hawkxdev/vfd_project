@@ -33,10 +33,12 @@ class Series(models.Model):
 
     class Power(models.IntegerChoices):
         P10 = 10, '1x230В: 0.4...2.2кВт; 3x400В: 0.75...3.7кВт'
+        P11 = 11, '1x230В: 0.2...2.2кВт; 3x400В: 0.75...2.2кВт'
         P20 = 20, '1x230В: 0.4...2.2кВт; 3x400В: 0.75...5.5кВт'
         P30 = 30, '1x230В: 0.2...2.2кВт; 3x400В: 0.4...7.5кВт'
         P40 = 40, '1x230В: 0.4...2.2кВт; 3x400В: 0.75...15кВт'
         P50 = 50, '1x230В: 0.2...2.2кВт; 3x400В: 0.4...22кВт'
+        P51 = 51, '1x230В: 0.4...2.2кВт; 3x400В: 0.4...22кВт'
         P60 = 60, '3x400В: 0.75...37кВт'
         P70 = 70, '3x400В: 0.75...90кВт'
         P80 = 80, '1x230В: 0.4...2.2кВт; 3x400В: 0.75...110кВт'
@@ -52,8 +54,9 @@ class Series(models.Model):
                                                    choices=Power.choices, blank=True, null=True)
 
     class ControlMethods(models.IntegerChoices):
-        C10 = 10, 'V/F (скалярное управление), \nSVC (бездатчиковое векторное управление)'
-        C20 = 20, 'V/F (скалярное управление), \nSVC (бездатчиковое векторное управление), \n' \
+        C10 = 10, 'V/F (скалярное управление)'
+        C20 = 20, 'V/F (скалярное управление), \nSVC (бездатчиковое векторное управление)'
+        C30 = 30, 'V/F (скалярное управление), \nSVC (бездатчиковое векторное управление), \n' \
                   'VC (векторное управление с замкнутым контуром)'
 
     control_methods = models.PositiveSmallIntegerField(verbose_name='Методы управления',
@@ -88,6 +91,7 @@ class Series(models.Model):
         P21 = 21, 'G type: 150% 60с, 180% 3с; \nP type: 120% 60с, 150% 3с'
         P22 = 22, '150% 60с; 180% 2с; 200% 0.5c'
         P23 = 23, 'G type: 150% 60с; 180% 3с'
+        P24 = 24, '150% 60с каждые 10 мин; 180% 2с'
         P30 = 30, '110% длит.; 150% 60с; 180% 5с'
         P31 = 31, 'Нормальный режим: 120% 60с, 150% 3с; \nТяжелый режим: 150% 60с, 200% 3с'
         P32 = 32, 'G type: 110% длит.; 150% 60с, 200% 4с; \nP type: 105% длит.; 120% 60с, 150% 1с'
@@ -112,6 +116,7 @@ class Series(models.Model):
         S20 = 20, 'G type: 150% / 0.5 Гц (SVC), 180% / 0 Гц (VC);\nP type: 100% / 0.5 Гц'
         S21 = 21, 'Auto torque boost, manual torque boost 0.1%-30%; ' \
                   'Cut-off frequency of torque boost 0Hz to maximum output frequency'
+        S22 = 22, 'До 180% от номинального (Функция намагничивания постоянным током)'
 
     starting_torque = models.PositiveSmallIntegerField('Пусковой момент', choices=StartingTorque.choices,
                                                        blank=True, null=True)
@@ -134,6 +139,7 @@ class Series(models.Model):
         S23 = 23, '2...16 (Default: 4/3)'
         S24 = 24, '1...16/10/5 (Default: 6/4.5/3/1.8)'
         S25 = 25, '0.5...16'
+        S26 = 26, '4...16 (Default: 4)'
         S30 = 30, '2...15/10/9 (Default: 8/6/4)'
         S31 = 31, '1...14 (Default: 8)'
         S32 = 32, '1...15 (Default: 8/4/2)'
@@ -176,6 +182,15 @@ class Series(models.Model):
     # Встроенная функция энергосбережения существенно уменьшает потребление электроэнергии
     # при работе в режиме ПИД-регулирования.
     automatic_energy_saving = models.BooleanField(verbose_name='Автоматическое энергосбережение', blank=True, null=True)
+
+    class CoolingFanControl(models.IntegerChoices):
+        F0 = 0, 'Нет'
+        F20 = 20, 'Режим автоматического управления / работает всё время при включении питания'
+        F50 = 50, 'На выбор 5 режимов работы вентилятора'
+        F51 = 51, 'На выбор 4 режима работы вентилятора'
+
+    cooling_fan_control = models.PositiveSmallIntegerField(verbose_name='Управление вентилятором охлаждения',
+                                                           choices=CoolingFanControl.choices, blank=True, null=True)
 
     class EngineProtection(models.IntegerChoices):
         P1 = 1, 'Перегрузка по току, перенапряжение, перегрев, потеря фазы и др.'
@@ -231,12 +246,20 @@ class Series(models.Model):
         P30 = 30, 'LED двухстрочный'
         P31 = 31, 'LED 5x7 (LCD опционально)'
         P32 = 32, 'LED двухстрочный (LCD опционально)'
-        P40 = 40, 'LCD дисплей'
+        P60 = 60, 'LCD дисплей'
+        P61 = 61, 'LCD базовая (LCD интеллектуальная опционально)'
 
     control_panel = models.PositiveSmallIntegerField('Панель управления', choices=ControlPanel.choices,
                                                      blank=True, null=True)
 
-    potentiometer = models.BooleanField('Потенциометр', blank=True, null=True)
+    class Potentiometer(models.IntegerChoices):
+        P0 = 0, 'Нет'
+        P10 = 10, 'Дополнительная плата потенциометра'
+        P20 = 20, 'Потенциометр в панели управления'
+        P30 = 30, 'Нажимное колёсико-энкодер'
+
+    potentiometer = models.PositiveSmallIntegerField('Потенциометр', choices=Potentiometer.choices,
+                                                     blank=True, null=True)
 
     control_panel_included = models.BooleanField('Панель управления в комплекте', blank=True, null=True)
 
@@ -259,8 +282,9 @@ class Series(models.Model):
 
     class Configurations(models.IntegerChoices):
         C0 = 0, 'Нет'
-        C1 = 10, 'Группировка параметров по применениям'
-        C2 = 11, 'Макросы'
+        C10 = 10, 'Группировка параметров по применениям'
+        C11 = 11, 'Макросы по применениям'
+        C20 = 20, 'Макросы, мастера настроек'
 
     pre_configurations = models.PositiveSmallIntegerField(verbose_name='Предварительные конфигурации (Макросы)',
                                                           choices=Configurations.choices, blank=True, null=True)
@@ -281,11 +305,11 @@ class Series(models.Model):
         C20 = 20, 'Платы расширения: Modbus RTU, Profibus DP'
         C30 = 30, 'Встроен: Modbus RTU'
         C40 = 40, 'Встроен: Modbus RTU; Платы расширения: Profibus DP'
-        C50 = 50, 'Встроен: Modbus RTU; Платы расширения: Profibus DP, Ethernet IP'
-        C60 = 60, 'Встроен: Modbus RTU; Платы расширения: Profibus DP, CANlink, CANopen'
-        C70 = 70, 'Встроен: Modbus RTU; Платы расширения: DeviceNet, Ethernet IP, Modbus TCP, CANopen, Profibus DP'
-        C80 = 80, 'Встроены: Modbus RTU, BACnet; ' \
-                  'Платы расширения: DeviceNet, Ethernet IP, Modbus TCP, CANopen, Profibus DP'
+        C41 = 41, 'Платы расширения: Modbus RTU, Ethernet, Profibus DP, ProfiNet IO, DeviceNet, CANopen, EtherCAT'
+        C50 = 50, 'Встроен: Modbus RTU; Платы расширения: Ethernet, Profibus DP'
+        C60 = 60, 'Встроен: Modbus RTU; Платы расширения: Profibus DP, CANopen, CANlink'
+        C70 = 70, 'Встроен: Modbus RTU; Платы расширения: Ethernet, DeviceNet, CANopen, Profibus DP'
+        C80 = 80, 'Встроены: Modbus RTU, BACnet; Платы расширения: Ethernet, DeviceNet, CANopen, Profibus DP'
 
     communications = models.PositiveSmallIntegerField('Протоколы связи',
                                                       choices=Communications.choices, blank=True, null=True)
@@ -302,8 +326,8 @@ class Series(models.Model):
         PO = 0, 'Нет'
         P10 = 10, 'Импульсный вход (плата расширения)'
         P20 = 20, 'Импульсный вход'
-        P30 = 30, 'Плата расширения энкодера (ABZ, UVW, Rotary transformer)'
-        P31 = 31, 'Плата расширения энкодера'
+        P50 = 50, 'Плата расширения энкодера (ABZ, UVW, Rotary transformer)'
+        P51 = 51, 'Плата расширения энкодера'
 
     encoder_support = models.PositiveSmallIntegerField(verbose_name='Подключение энкодера',
                                                        choices=Encoder.choices, blank=True, null=True)
@@ -369,6 +393,7 @@ class Series(models.Model):
     class MotorCable(models.IntegerChoices):
         D10 = 10, 'Без дросселя: до 50м; С дросселем: до 100м'
         D11 = 11, 'Если длина кабелей двигателя превышает 50 м, рекомендуется использовать моторный дроссель.'
+        D12 = 12, 'Без дросселя: до 50м; С дросселем: до 100м; EMC C3: до 30м'
         D20 = 20, 'Если длина кабелей двигателя превышает 100 м, рекомендуется использовать моторный дроссель.'
         D30 = 30, 'Без дросселя: экран.кабель 35...100м в зависимости от номинала; неэкран. 50...150м. \n' \
                   'С дросселем: экран.кабель 50...150м; неэкран. 90...225м'
@@ -442,6 +467,49 @@ class Series(models.Model):
                                                                  choices=BoardsProtection.choices,
                                                                  blank=True, null=True)
 
+    class MinimumSize(models.IntegerChoices):
+        # По габаритам HV10 (по глубине) меньше чем ACS355, что позволяет засунуть этот ПЧ в корпус глубиной 150мм
+        # (если речь идет о стандартных типоразмерах большинства корпусов производства РБ и РФ типа ЩМП:
+        # 1 - 395х410х220 мм; 2 - 500х400х220 мм; и т.д.). НО! Применяя корпус глубиной 150 мм, мы можем сэкономить
+        # место, например, в венткамере, где шкаф управления с ПЧ закреплен прямо на вентустановке.
+        # Массовое применение 1ф ПЧ - управление различными задвижками, т.е. открыть/закрыть. В этом случае мелкий
+        # корпус позволяет без проблем разместить ПЧ в непосредственной близости от исполнительного механизма.
+
+        # "HV100 серия, по высоте (глубине) на 5мм меньше чем 355. В связи с этим, эту серию уже придется монтировать
+        # в корпуса глубиной 220мм. По ширине эта серия на 25 мм больше, а учесть что 355 шириной всего 70 мм,
+        # то HV100 ""съедает"" примерно 35% места на монтажной панели при компоновке в ряд.
+        P30 = 30, '212x95x154'  # HV100
+        P40 = 40, '202x70x161'  # ACS355
+        P42 = 42, '142x72x159'  # MS300
+        P50 = 50, '170x78x134'  # HV10
+        P51 = 51, '142x72x143'  # ME300
+
+        P41 = 41, '176x90x145'  # HV480
+        P31 = 31, '186x125x170'  # HV610
+
+    minimum_size = models.PositiveSmallIntegerField(verbose_name='Минимальный габарит, ВхШхГ',
+                                                    choices=MinimumSize.choices, blank=True, null=True)
+
+    class PackageSet(models.IntegerChoices):
+        P0 = 0, 'Нет'
+        P10 = 10, 'Плотный картон, вспененный полиэтилен, сокращённый мануал'
+        P11 = 11, 'Плотный картон, вспененный полиэтилен, полный мануал'
+        P12 = 12, 'Плотный картон, краткая инструкция по вводу в эксплуатацию'
+        P30 = 30, 'Плотный картон, надувная пузырчатая пленка, сокращённый мануал'
+        P31 = 31, 'Плотный картон, надувная пузырчатая пленка, полный мануал'
+        P32 = 32, 'Плотный картон, сокращённый мануал'
+
+    package_set = models.PositiveSmallIntegerField(verbose_name='Комплект поставки, упаковка',
+                                                   choices=PackageSet.choices, blank=True, null=True)
+
+    class CaseQuality(models.IntegerChoices):
+        P10 = 10, 'Прочный корпус; неудобное снятие клеммной крышки, дребезжит крышка вентилятора'
+        P30 = 30, 'Прочный корпус, качественная сборка; чёрный матовый, не вонючий пластик'
+        P31 = 31, 'Прочный корпус, качественная сборка'
+
+    case_quality = models.PositiveSmallIntegerField(verbose_name='Качество корпуса',
+                                                    choices=CaseQuality.choices, blank=True, null=True)
+
     description = models.TextField('Описание', blank=True, null=True)
 
     def __str__(self):
@@ -456,9 +524,9 @@ class Series(models.Model):
 class FrequencyDrive(models.Model):
     article = models.CharField('Артикул', max_length=30, unique=True)
     name = models.CharField('Наименование', max_length=200, blank=True, null=True)
-    series = models.ForeignKey(Series, verbose_name='Серия', on_delete=models.PROTECT, blank=False, null=False)
+    series = models.ForeignKey(Series, verbose_name='Серия', on_delete=models.PROTECT)
     power = models.FloatField('Мощность')
-    current = models.FloatField('Ток')
+    current = models.FloatField('Ток', blank=True, null=True)
     VOLT_CHOICES = (
         (400, 400),
         (230, 230),

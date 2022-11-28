@@ -41,7 +41,7 @@ class Supplier(models.Model):
     class Meta:
         verbose_name = 'Поставщик'
         verbose_name_plural = 'Поставщики'
-        ordering = ('name',)
+        ordering = ('id',)
 
 
 class Brand(models.Model):

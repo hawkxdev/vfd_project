@@ -22,8 +22,8 @@ def add_vfd(row):
         article=row['article'],
         defaults={
             'series_id': row['series_id'],
-            'name': row['name'],
-            'current': row['current'],
+            'name': row['name'] if not pd.isnull(row['name']) else None,
+            'current': row['current'] if not pd.isnull(row['current']) else None,
             'power': row['power'],
             'voltage': row['voltage'],
         }

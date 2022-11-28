@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('supplier.urls')),
     path('', include('vfd.urls')),
     path('', include('ips.urls')),
+    path('', include('ss.urls')),
 ]
 
 if settings.DEBUG:
