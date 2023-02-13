@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'vfd.apps.VfdConfig',
     'ips.apps.IpsConfig',
     'ss.apps.SSConfig',
+    'hmi.apps.HmiConfig',
 ]
 
 MIDDLEWARE = [

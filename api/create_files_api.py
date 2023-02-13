@@ -36,7 +36,7 @@ def create_compare_price():
     #     Block((8, 12, 15)),
     # ]
 
-    comparison_zone.suppliers = [9, 6, 10, 8, 3, 5, 12, 13]
+    comparison_zone.suppliers = [6, 12, 12]
     # 	Delixi Hangzhou Inverter Co LTD	9
     # 	HNC Electric Limited	6
     # 	Rievtech Electronic Co Ltd	10
@@ -47,10 +47,10 @@ def create_compare_price():
     #   Магоста-Групп ООО	13
 
     comparison_zone.blocks = [
-        Block((29, 19, 34, 24, 9, 13, 36, 37)),
-        Block((31, 19, 34, 26, 7, 14, 1, 38)),
-        Block((30, 20, 34, 26, 7, 15, 3, 38)),
-        Block((33, 22, 35, 25, 6, 16, 4, 38)),
+        # Block((19, 37, 38)),
+        # Block((20, 37, 38)),
+        Block((19, 36, 3)),
+        Block((20, 36, 3)),
     ]
     # 	Delixi	EM60	31
     # 	Delixi	E100	30
@@ -151,7 +151,13 @@ def create_compare_price():
                         xlsx.ws.cell(row=row_s, column=column_by_n(j)).value = vfd.article
                         xlsx.ws.cell(row=row_s, column=column_by_n(j) + 1).value = vfd.name
 
+
                         price = get_price_vfd(supplier, vfd)
+                        # print(supplier, vfd.article, vfd.name)
+                        # try:
+                        #     print(supplier, vfd.article, vfd.name, price.price)
+                        # except:
+                        #     pass
                         col_r = None
                         if price:
                             price = price.price
@@ -214,7 +220,10 @@ def create_compare_series(series):
     print(f'{series = }')
     # series = ['36', '9', '13', '19', '24', '29', '34', '37']
     # series = ['11', '19', '20']
-    series = ['11', '13', '14', '19', '20']
+    # series = ['11', '13', '14', '19', '20']
+    # series = ['19', '20', '29', '31', '34']
+    # series = ['19', '29']
+    series = ['19', '20', '39', '40']
 
     filename = 'upload/compare_series.xlsx'
     xlsx = Xlsx(filename, overwrite=True)
