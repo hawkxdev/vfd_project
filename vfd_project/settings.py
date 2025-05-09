@@ -3,8 +3,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-glt7_vp*qrpu+t+3@vqd!qb=vm-pbe=p0x9_e-(6=hz56i+(7)'
+# SECURITY WARNING: keep the secret key used in production secret!
+# В реальном проекте следует использовать переменные окружения
+SECRET_KEY = 'django-insecure-your-secret-key-here'
 
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -38,8 +41,7 @@ ROOT_URLCONF = 'vfd_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
