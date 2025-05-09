@@ -36,7 +36,7 @@ def create_compare_price():
     #     Block((8, 12, 15)),
     # ]
 
-    comparison_zone.suppliers = [6, 12, 12]
+    comparison_zone.suppliers = [16, 6, 12, 4, 17]
     # 	Delixi Hangzhou Inverter Co LTD	9
     # 	HNC Electric Limited	6
     # 	Rievtech Electronic Co Ltd	10
@@ -45,12 +45,15 @@ def create_compare_price():
     # 	Delta Electronics (NL)	5
     #   INVT Electric Co., Ltd  12
     #   Магоста-Групп ООО	13
+    #   TechSun Technology (Guangzhou) Co.,Ltd	15
 
     comparison_zone.blocks = [
         # Block((19, 37, 38)),
         # Block((20, 37, 38)),
-        Block((19, 36, 3)),
-        Block((20, 36, 3)),
+
+        Block((48, 19, 1, 11, 11)),
+        Block((49, 20, 3, 11, 11)),
+        Block((50, 47, 46, 12, 12)),
     ]
     # 	Delixi	EM60	31
     # 	Delixi	E100	30
@@ -92,9 +95,14 @@ def create_compare_price():
     #   Canroon	CV800	37
     # 	Canroon	CV900	38
 
-    eur_rub = 55.96
-    eur_usd = 0.97
-    usd_rub = 57.93
+    # 	TechSun	TS300 44
+    # 	TechSun	TS200 43
+
+    eur_rub = 100.74
+    eur_usd = 0.92
+    usd_rub = 92.71
+    usd_cny = 7.2477
+    eur_cny = 7.8750
 
     xlsx = Xlsx('upload/compare.xlsx', overwrite=True)
     row = 1
@@ -138,7 +146,12 @@ def create_compare_price():
                 # else:
                 #     block.price_col.append(column_by_n(j) + 2)
 
-                if currency != 'USD':
+                # if currency != 'USD':
+                #     block.price_col.append(column_by_n(j) + 3)
+                # else:
+                #     block.price_col.append(column_by_n(j) + 2)
+
+                if currency != 'CNY':
                     block.price_col.append(column_by_n(j) + 3)
                 else:
                     block.price_col.append(column_by_n(j) + 2)
@@ -150,7 +163,6 @@ def create_compare_price():
                     if vfd:
                         xlsx.ws.cell(row=row_s, column=column_by_n(j)).value = vfd.article
                         xlsx.ws.cell(row=row_s, column=column_by_n(j) + 1).value = vfd.name
-
 
                         price = get_price_vfd(supplier, vfd)
                         # print(supplier, vfd.article, vfd.name)
@@ -168,10 +180,15 @@ def create_compare_price():
                             # elif currency == 'USD':
                             #     price_val = round(price_val / eur_usd, 2)
 
-                            if currency == 'RUB':
-                                price_val = round(price_val / usd_rub, 2)
-                            elif currency == 'EUR':
-                                price_val = round(price_val * eur_usd, 2)
+                            # if currency == 'RUB':
+                            #     price_val = round(price_val / usd_rub, 2)
+                            # elif currency == 'EUR':
+                            #     price_val = round(price_val * eur_usd, 2)
+
+                            if currency == 'EUR':
+                                price_val = round(price_val * eur_cny, 2)
+                            elif currency == 'USD':
+                                price_val = round(price_val * usd_cny, 2)
 
                             xlsx.ws.cell(row=row_s, column=column_by_n(j) + 2).value = price
                             col = xl_col_to_name(column_by_n(j) + 1)
@@ -189,12 +206,19 @@ def create_compare_price():
                                 #     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
                                 #         .value = f'={col1}{row_s}/{eur_usd}'
 
-                                if currency == 'RUB':
+                                # if currency == 'RUB':
+                                #     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
+                                #         .value = f'={col1}{row_s}/{usd_rub}'
+                                # elif currency == 'EUR':
+                                #     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
+                                #         .value = f'={col1}{row_s}*{eur_usd}'
+
+                                if currency == 'EUR':
                                     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
-                                        .value = f'={col1}{row_s}/{usd_rub}'
-                                elif currency == 'EUR':
+                                        .value = f'={col1}{row_s}*{eur_cny}'
+                                elif currency == 'USD':
                                     xlsx.ws.cell(row=row_s, column=column_by_n(j) + 3) \
-                                        .value = f'={col1}{row_s}*{eur_usd}'
+                                        .value = f'={col1}{row_s}*{usd_cny}'
 
                                 xlsx.ws[f'{col2}{row_s}'].number_format = '0.00'
                                 col_r = column_by_n(j) + 3

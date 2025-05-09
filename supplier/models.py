@@ -32,6 +32,7 @@ class Supplier(models.Model):
         ('RUB', 'RUB'),
         ('EUR', 'EUR'),
         ('USD', 'USD'),
+        ('CNY', 'CNY'),
     )
     currency = models.CharField('Валюта', max_length=3, choices=CURRENCY_CHOICES)
 

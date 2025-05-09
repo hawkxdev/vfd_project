@@ -141,3 +141,4 @@ dmypy.json
 
 media/
 upload/
+.DS_Store
